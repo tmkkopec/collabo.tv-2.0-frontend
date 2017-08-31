@@ -1,0 +1,16 @@
+#video {
+    text-align: center;
+}
+
+iframe {
+    height: 240px;
+}
+
+video {
+    padding: 10px;
+    width: 240px;
+}
+
+.broadcast .mdl-grid {
+    text-align: center;
+}
