@@ -3,13 +3,14 @@
 ## Requirements
 * node.js
 * npm (included in node.js)
+* bower (npm i -g bower)
 
 ## Usage
 * `git clone` repo
 * `cd` to repo
-* `npm install` to fetch dependencies for server side
+* `npm install`  and `bower install` to fetch dependencies
 
-## Generate static files
+## Standalone build
 * `npm run build` to build static files. Output is in `build` directory
 * copy `build` directory to backend server directory `public`
 * run backend server: `npm start` 
