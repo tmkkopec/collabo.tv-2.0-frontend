@@ -1,5 +1,6 @@
 import io from 'socket.io-client';
 
+let currentRoom="";
 class WebRTCConfig {
     constructor(roomID) {
         const self = this;
@@ -14,6 +15,7 @@ class WebRTCConfig {
         this.socket = io.connect();
 
         this.socket.on('created', function (room) {
+			currentRoom=room;
             console.log('Created room ' + room);
             self.isInitiator = true;
         });
@@ -28,6 +30,7 @@ class WebRTCConfig {
         });
 
         this.socket.on('joined', function (room) {
+			currentRoom=room;
             console.log('joined: ' + room);
             self.isChannelReady = true;
         });
@@ -218,8 +221,10 @@ class WebRTCConfig {
     }
 
     logout() {
-        if (this.isStarted)
+        if (this.isStarted){
+			this.socket.emit("logout",currentRoom);
             this.pc.removeTrack(this.sender);
+		}
     }
 
 }
