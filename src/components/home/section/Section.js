@@ -13,8 +13,15 @@ class Section extends Component {
         this.state = {
             socketID: undefined,
             remoteVideoIDs: [],
-            prevRemoteVideoIDs: []
+            prevRemoteVideoIDs: [],
+            activeVideo: 'Qmn2bhY07NQ'
         };
+        Section.instance = this
+        this.changeVideo = this.changeVideo.bind(this)
+    }
+
+    changeVideo(video){
+        this.setState({activeVideo: video})
     }
 
     componentDidMount() {
@@ -52,7 +59,7 @@ class Section extends Component {
                         </MdlCell>
                         <MdlCell cellWidth={6}>
                             <div id="video">
-                                <iframe title="centerVideo" src="https://www.youtube.com/embed/Qmn2bhY07NQ"/>
+                                <iframe title="centerVideo" src={"https://www.youtube.com/embed/"+this.state.activeVideo}/>
                             </div>
                         </MdlCell>
                     </MdlGrid>

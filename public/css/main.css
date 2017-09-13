@@ -14,3 +14,12 @@ video {
 .broadcast .mdl-grid {
     text-align: center;
 }
+
+.mdl-layout__drawer {
+    width: 500px;
+    left: -250px;
+}
+
+.mdl-layout__drawer.is-visible {
+    left: 0;
+}
