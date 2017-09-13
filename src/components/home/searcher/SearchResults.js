@@ -5,7 +5,8 @@ export default class SearchResults extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {visible: props.visible, items: []}
+        this.state = {visible: props.visible,
+            items: []}
 
     }
 
@@ -17,8 +18,11 @@ export default class SearchResults extends Component {
                 console.log(this.props.items[0])
                 return(
                     <div className="mdl-grid mdl-cell--stretch">
-                        <YoutubeCell thumbnail={this.props.items[0].snippet.thumbnails.default.url}
-                            title={this.props.items[0].snippet.title} author={this.props.items[0].snippet.channelTitle}/>
+                        <YoutubeCell items={this.props.items[0]}/>
+                        <YoutubeCell items={this.props.items[1]}/>
+                        <YoutubeCell items={this.props.items[2]}/>
+                        <YoutubeCell items={this.props.items[3]}/>
+                        <YoutubeCell items={this.props.items[4]}/>
                     </div>);
             }
             else {
