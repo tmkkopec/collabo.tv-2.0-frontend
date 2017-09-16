@@ -25,22 +25,12 @@ export default function Participant(name, ws) {
     container.appendChild(video);
     container.appendChild(span);
     container.onclick = switchContainerClass;
-    document.getElementById('participants').appendChild(container);
 
     span.appendChild(document.createTextNode(name));
 
     video.id = 'video-' + name;
     video.autoplay = true;
     video.controls = false;
-
-
-    this.getElement = function () {
-        return container;
-    }
-
-    this.getVideoElement = function () {
-        return video;
-    }
 
     function switchContainerClass() {
         if (container.className === PARTICIPANT_CLASS) {
@@ -58,34 +48,33 @@ export default function Participant(name, ws) {
         return ((document.getElementsByClassName(PARTICIPANT_MAIN_CLASS)).length != 0);
     }
 
-    function sendMessage(message) {
-        var jsonMessage = JSON.stringify(message);
-        console.log('Senging message: ' + jsonMessage);
-        this.ws.send(jsonMessage);
-    }
+    this.sendMessage = function (message) {
+        console.log('Sending message: ' + message.id);
+        this.ws.send(message);
+    };
 
     this.offerToReceiveVideo = function (error, offerSdp, wp) {
-        if (error) return console.error("sdp offer error")
+        if (error) return console.error("sdp offer error");
         console.log('Invoking SDP offer callback function');
-        var msg = {
+        const msg = {
             id: "receiveVideoFrom",
             sender: name,
             sdpOffer: offerSdp
         };
-        sendMessage(msg);
-    }
+        this.sendMessage(msg);
+    };
 
 
     this.onIceCandidate = function (candidate, wp) {
         console.log("Local candidate" + candidate);
 
-        var message = {
+        const message = {
             id: 'onIceCandidate',
             candidate: candidate,
             sender: name
         };
-        sendMessage(message);
-    }
+        this.sendMessage(message);
+    };
 
     Object.defineProperty(this, 'rtcPeer', {writable: true});
 

@@ -25,18 +25,8 @@ class Section extends Component {
     }
 
     componentDidMount() {
-        navigator.mediaDevices
-            .getUserMedia({
-                audio: false,
-                video: true
-            })
-            .then(stream => {
-                this.props.webrtc.section = this;
-                this.props.webrtc.register(stream);
-            })
-            .catch(function (e) {
-                alert('getUserMedia() error: ' + e.toString());
-            });
+        this.props.webrtc.section = this;
+        this.props.webrtc.register();
     }
 
     render() {

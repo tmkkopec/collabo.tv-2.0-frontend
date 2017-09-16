@@ -234,7 +234,7 @@ class WebRTCConfig {
 
 export default class A {
     constructor(room, name) {
-        this.ws = io.connect(`https://${window.location.host}`, {path: '/groupcall'});
+        this.ws = io.connect(`https://${window.location.host}`);
         this.participants = {};
         this.name = name;
         this.room = room;
@@ -285,14 +285,13 @@ export default class A {
         this._section = section;
     }
 
-    //!!!!!!!!!!!!!!!!!!!!!!!
-    register(stream) {
-        document.querySelector("#localVideo").srcObject = stream;
+    register() {
         const message = {
             id: 'joinRoom',
             name: this.name,
             room: this.room,
         };
+
         this.sendMessage(message);
     }
 
@@ -373,7 +372,7 @@ export default class A {
         const participant = new Participant(sender, this.ws);
         this.participants[sender] = participant;
         const video = document.querySelector('#r' + sender);
-
+        console.log('remoteVideo', video);
         const options = {
             remoteVideo: video,
             onicecandidate: participant.onIceCandidate.bind(participant)
@@ -386,8 +385,7 @@ export default class A {
                 }
                 this.generateOffer(participant.offerToReceiveVideo.bind(participant));
             }
-        )
-        ;
+        );
     }
 
     onParticipantLeft(request) {
@@ -403,8 +401,7 @@ export default class A {
     }
 
     sendMessage(message) {
-        const jsonMessage = JSON.stringify(message);
-        console.log('Senging message: ' + jsonMessage);
-        this.ws.emit('message', jsonMessage);
+        console.log('Sending message: ' + message.id);
+        this.ws.emit('message', message);
     }
 }
