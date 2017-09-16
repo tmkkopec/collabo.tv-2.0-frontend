@@ -12,9 +12,7 @@ class AuthRoute extends React.Component {
         this.state = {isAuthenticated: false};
 
         this.isAuthenticated()
-            .then(status => {
-                this.setState({authenticated: status === 200})
-            });
+            .then(status => this.setState({authenticated: status === 200}));
     }
 
     isAuthenticated() {

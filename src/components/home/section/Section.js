@@ -16,11 +16,11 @@ class Section extends Component {
             prevRemoteVideoIDs: [],
             activeVideo: 'Qmn2bhY07NQ'
         };
-        Section.instance = this
+        Section.instance = this;
         this.changeVideo = this.changeVideo.bind(this)
     }
 
-    changeVideo(video){
+    changeVideo(video) {
         this.setState({activeVideo: video})
     }
 
@@ -30,9 +30,9 @@ class Section extends Component {
                 audio: false,
                 video: true
             })
-            .then((stream) => {
+            .then(stream => {
                 this.props.webrtc.section = this;
-                this.props.webrtc.gotStream(stream);
+                this.props.webrtc.register(stream);
             })
             .catch(function (e) {
                 alert('getUserMedia() error: ' + e.toString());
@@ -59,7 +59,8 @@ class Section extends Component {
                         </MdlCell>
                         <MdlCell cellWidth={6}>
                             <div id="video">
-                                <iframe title="centerVideo" src={"https://www.youtube.com/embed/"+this.state.activeVideo}/>
+                                <iframe title="centerVideo"
+                                        src={"https://www.youtube.com/embed/" + this.state.activeVideo}/>
                             </div>
                         </MdlCell>
                     </MdlGrid>
