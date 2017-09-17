@@ -240,7 +240,7 @@ export default class A {
         this.room = room;
 
         window.onbeforeunload = () => {
-            this.ws.disconnect();
+            this.logout();
         };
 
         this.ws.on('connect', () => {
