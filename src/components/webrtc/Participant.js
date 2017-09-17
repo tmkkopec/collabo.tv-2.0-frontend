@@ -50,7 +50,7 @@ export default function Participant(name, ws) {
 
     this.sendMessage = function (message) {
         console.log('Sending message: ' + message.id);
-        this.ws.send(message);
+        this.ws.emit('message', message);
     };
 
     this.offerToReceiveVideo = function (error, offerSdp, wp) {

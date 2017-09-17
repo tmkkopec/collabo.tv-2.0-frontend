@@ -352,10 +352,9 @@ export default class A {
             }
         );
 
-        msg.data.forEach(this.receiveVideo);
+        msg.data.forEach(this.receiveVideo.bind(this));
     }
 
-    //!!!!!!!!!!!!!!!!!!!!!!!
     logout() {
         this.sendMessage({
             id: 'leaveRoom'
@@ -372,7 +371,7 @@ export default class A {
         const participant = new Participant(sender, this.ws);
         this.participants[sender] = participant;
         const video = document.querySelector('#r' + sender);
-        console.log('remoteVideo', video);
+
         const options = {
             remoteVideo: video,
             onicecandidate: participant.onIceCandidate.bind(participant)
