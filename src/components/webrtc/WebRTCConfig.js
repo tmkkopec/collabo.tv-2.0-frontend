@@ -2,8 +2,6 @@ import io from 'socket.io-client';
 import kurentoUtils from 'kurento-utils';
 import Participant from './Participant';
 
-let currentRoom = "";
-
 export default class KurentoConfig {
     constructor(room, name) {
         this.ws = io.connect(`https://${window.location.host}`);
@@ -27,9 +25,10 @@ export default class KurentoConfig {
                     this.onExistingParticipants(parsedMessage);
                     break;
                 case 'newParticipantArrived':
-                    const ids = this._section.state.remoteVideoIDs;
+                    const remoteVideos = this._section.state.remoteVideos;
+                    remoteVideos[parsedMessage.name] = '';
 
-                    this._section.setState({remoteVideoIDs: ids.concat([parsedMessage.name])},
+                    this._section.setState({remoteVideos: remoteVideos},
                         () => this.onNewParticipant(parsedMessage));
                     break;
                 case 'participantLeft':
@@ -41,10 +40,8 @@ export default class KurentoConfig {
                 case 'iceCandidate':
                     this.participants[parsedMessage.name].rtcPeer.addIceCandidate(parsedMessage.candidate,
                         function (error) {
-                            if (error) {
-                                console.error("Error adding candidate: " + error);
-                                return;
-                            }
+                            if (error)
+                                return console.error("Error adding candidate: " + error);
                         });
                     break;
                 default:
@@ -72,26 +69,17 @@ export default class KurentoConfig {
     }
 
     receiveVideoResponse(result) {
+        const remoteVideos = this._section.state.remoteVideos;
+        const myName = this.name;
         this.participants[result.name].rtcPeer.processAnswer(result.sdpAnswer, function (error) {
-                if (error) return console.error(error);
+                if (error)
+                    return console.error(error);
+
+                if (result.name !== myName)
+                    remoteVideos[result.name] = document.querySelector(`#remote_${result.name}`).getAttribute('src');
             }
         );
     }
-
-    // callResponse(message) {
-    //     if (message.response != 'accepted') {
-    //         console.info('Call not accepted by peer. Closing call');
-    //         stop();
-    //     } else {
-    //         webRtcPeer.processAnswer(message.sdpAnswer, function (error) {
-    //                 if (error)
-    //                     return;
-    //                 console.error(error);
-    //             }
-    //         )
-    //         ;
-    //     }
-    // }
 
     onExistingParticipants(msg) {
         const constraints = {
@@ -124,7 +112,13 @@ export default class KurentoConfig {
             }
         );
 
-        msg.data.forEach(this.receiveVideo.bind(this));
+        const remoteVideos = msg.data.reduce(function (accumulator, current) {
+            accumulator[current] = '';
+            return accumulator;
+        }, {});
+
+        this._section.setState({remoteVideos: remoteVideos},
+            () => msg.data.forEach(this.receiveVideo.bind(this)));
     }
 
     logout() {
@@ -142,7 +136,7 @@ export default class KurentoConfig {
     receiveVideo(sender) {
         const participant = new Participant(sender, this.ws);
         this.participants[sender] = participant;
-        const video = document.querySelector('#r' + sender);
+        const video = document.querySelector('#remote_' + sender);
 
         const options = {
             remoteVideo: video,
@@ -164,9 +158,9 @@ export default class KurentoConfig {
         const participant = this.participants[request.name];
         participant.dispose();
 
-        const ids = this._section.state.remoteVideoIDs;
-        ids.splice(ids.indexOf(request.name), 1);
-        this._section.setState({remoteVideoIDs: ids});
+        const remoteVideos = this._section.state.remoteVideos;
+        delete remoteVideos[request.name];
+        this._section.setState({remoteVideos: remoteVideos});
 
         delete this.participants[request.name];
     }
