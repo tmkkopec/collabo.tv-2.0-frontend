@@ -11,35 +11,24 @@ class Section extends Component {
         super(props);
 
         this.state = {
-            socketID: undefined,
-            remoteVideoIDs: [],
-            prevRemoteVideoIDs: [],
+            remoteVideos: {},
             activeVideo: 'Qmn2bhY07NQ'
         };
-        Section.instance = this
+        Section.instance = this;
         this.changeVideo = this.changeVideo.bind(this)
     }
 
-    changeVideo(video){
+    changeVideo(video) {
         this.setState({activeVideo: video})
     }
 
     componentDidMount() {
-        navigator.mediaDevices
-            .getUserMedia({
-                audio: false,
-                video: true
-            })
-            .then((stream) => {
-                this.props.webrtc.section = this;
-                this.props.webrtc.gotStream(stream);
-            })
-            .catch(function (e) {
-                alert('getUserMedia() error: ' + e.toString());
-            });
+        this.props.webrtc.section = this;
+        this.props.webrtc.register();
     }
 
     render() {
+        const cellWidth = Math.max(12/(Object.keys(this.state.remoteVideos).length + 1), 6);
         return (
             <section className="mdl-layout__tab-panel is-active" id={'scroll-tab-' + this.props.id}>
                 <div className="page-content">
@@ -47,11 +36,12 @@ class Section extends Component {
                         <MdlCell cellWidth={6}>
                             <div className="broadcast">
                                 <MdlGrid>
-                                    <Video cellWidth={12 / (this.state.remoteVideoIDs.length + 1)}
+                                    <Video cellWidth={cellWidth}
                                            videoId="localVideo"/>
-                                    {this.state.remoteVideoIDs.map((videoId) =>
-                                        <Video cellWidth={12 / (this.state.remoteVideoIDs.length + 1)}
-                                               videoId={videoId}
+                                    {Object.entries(this.state.remoteVideos).map(video =>
+                                        <Video cellWidth={cellWidth}
+                                               videoId={video[0]}
+                                               src={video[1]}
                                                isRemoteVideo={true}
                                                key={uniqueId()}/>)}
                                 </MdlGrid>
@@ -59,7 +49,8 @@ class Section extends Component {
                         </MdlCell>
                         <MdlCell cellWidth={6}>
                             <div id="video">
-                                <iframe title="centerVideo" src={"https://www.youtube.com/embed/"+this.state.activeVideo}/>
+                                <iframe title="centerVideo"
+                                        src={"https://www.youtube.com/embed/" + this.state.activeVideo}/>
                             </div>
                         </MdlCell>
                     </MdlGrid>

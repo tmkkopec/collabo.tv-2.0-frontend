@@ -12,7 +12,8 @@ export default class HomePage extends Component {
         super(props);
 
         this.roomIDs = [Cookie.get('roomId')];
-        this.webrtc = new WebRTCConfig(this.roomIDs[0]);
+        this.name = Cookie.get('nickname');
+        this.webrtc = new WebRTCConfig(this.roomIDs[0], this.name);
 
         this.onLogout = this.onLogout.bind(this);
     }
