@@ -78,21 +78,6 @@ export default class KurentoConfig {
         );
     }
 
-    // callResponse(message) {
-    //     if (message.response != 'accepted') {
-    //         console.info('Call not accepted by peer. Closing call');
-    //         stop();
-    //     } else {
-    //         webRtcPeer.processAnswer(message.sdpAnswer, function (error) {
-    //                 if (error)
-    //                     return;
-    //                 console.error(error);
-    //             }
-    //         )
-    //         ;
-    //     }
-    // }
-
     onExistingParticipants(msg) {
         const constraints = {
             audio: true,
