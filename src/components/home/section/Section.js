@@ -28,30 +28,29 @@ class Section extends Component {
     }
 
     render() {
-        const cellWidth = Math.max(12/(Object.keys(this.state.remoteVideos).length + 1), 6);
+        // const cellWidth = Math.max(12 / (Object.keys(this.state.remoteVideos).length + 1), 6);
+        const cellWidth = 12;
         return (
-            <section className="mdl-layout__tab-panel is-active" id={'scroll-tab-' + this.props.id}>
-                <div className="page-content">
-                    <MdlGrid>
-                        <MdlCell cellWidth={6}>
-                            <div className="broadcast">
-                                <MdlGrid>
-                                    <Video cellWidth={cellWidth}
-                                           videoId="localVideo"/>
-                                    {Object.entries(this.state.remoteVideos).map(video =>
-                                        <Video cellWidth={cellWidth}
-                                               videoId={video[0]}
-                                               src={video[1]}
-                                               isRemoteVideo={true}
-                                               key={uniqueId()}/>)}
-                                </MdlGrid>
-                            </div>
-                        </MdlCell>
-                        <MdlCell cellWidth={6}>
+            <section className="mdl-layout__tab-panel is-active full-screen" id={'scroll-tab-' + this.props.id}>
+                <div className="page-content full-screen">
+                    <MdlGrid className={'full-screen'}>
+                        <MdlCell cellWidth={8}>
                             <div id="video">
                                 <iframe title="centerVideo"
                                         src={"https://www.youtube.com/embed/" + this.state.activeVideo}/>
                             </div>
+                        </MdlCell>
+                        <MdlCell cellWidth={4}>
+                            <MdlGrid className={'participantsVideos'}>
+                                <Video cellWidth={cellWidth}
+                                       videoId="localVideo"/>
+                                {Object.entries(this.state.remoteVideos).map(video =>
+                                    <Video cellWidth={cellWidth}
+                                           videoId={video[0]}
+                                           src={video[1]}
+                                           isRemoteVideo={true}
+                                           key={uniqueId()}/>)}
+                            </MdlGrid>
                         </MdlCell>
                     </MdlGrid>
                 </div>

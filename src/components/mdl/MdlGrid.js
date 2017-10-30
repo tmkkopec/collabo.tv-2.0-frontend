@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 export default class MdlGrid extends Component {
     render() {
-        return <div className="mdl-grid">{this.props.children}</div>;
+        const name = this.props.className || '';
+        return <div className={`mdl-grid ${name}`}>{this.props.children}</div>;
     }
 }
+
+MdlGrid.propTypes = {
+    className: PropTypes.string
+};
