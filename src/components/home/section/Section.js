@@ -1,10 +1,8 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import Video from './Video';
 import MdlGrid from '../../mdl/MdlGrid';
 import MdlCell from '../../mdl/MdlCell';
-
-const uniqueId = require('lodash/uniqueId');
+import VideoController from "../video/VideoController";
 
 class Section extends Component {
     constructor(props) {
@@ -28,8 +26,6 @@ class Section extends Component {
     }
 
     render() {
-        // const cellWidth = Math.max(12 / (Object.keys(this.state.remoteVideos).length + 1), 6);
-        const cellWidth = 12;
         return (
             <section className="mdl-layout__tab-panel is-active full-screen" id={'scroll-tab-' + this.props.id}>
                 <div className="page-content full-screen">
@@ -41,16 +37,7 @@ class Section extends Component {
                             </div>
                         </MdlCell>
                         <MdlCell cellWidth={4}>
-                            <MdlGrid className={'participantsVideos'}>
-                                <Video cellWidth={cellWidth}
-                                       videoId="localVideo"/>
-                                {Object.entries(this.state.remoteVideos).map(video =>
-                                    <Video cellWidth={cellWidth}
-                                           videoId={video[0]}
-                                           src={video[1]}
-                                           isRemoteVideo={true}
-                                           key={uniqueId()}/>)}
-                            </MdlGrid>
+                            <VideoController remoteVideos={this.state.remoteVideos}/>
                         </MdlCell>
                     </MdlGrid>
                 </div>

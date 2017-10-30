@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import Section from "../section/Section"
 
 export default class YoutubeCell extends Component {
@@ -13,8 +13,8 @@ export default class YoutubeCell extends Component {
         event.preventDefault();
     }
 
-    render(){
-        return(
+    render() {
+        return (
             <div className="mdl-cell--12-col" onClick={this.onClick}>
                 <div className="mdl-grid">
                     <div className="mdl-cell--4-col">

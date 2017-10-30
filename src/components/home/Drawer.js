@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import Searcher from "./searcher/Searcher"
 
 export default class Drawer extends Component {
