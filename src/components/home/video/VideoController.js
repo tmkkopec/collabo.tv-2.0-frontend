@@ -14,7 +14,9 @@ function Wrapper(props) {
                    isRemoteVideo={props.isRemoteVideo}
                    key={props.key}
             />
-            <VideoOptions/>
+            <VideoOptions toggleVideo={() => props.toggleVideo(props.videoId)}
+                          toggleAudio={() => props.toggleAudio(props.videoId)}
+            />
         </MdlGrid>
     )
 }
@@ -23,12 +25,18 @@ export default class VideoController extends Component {
     render() {
         return (
             <div className={'participantsVideos'}>
-                <Wrapper videoId='localVideo'/>
+                <Wrapper videoId={this.props.localUsername}
+                         toggleVideo={this.props.toggleVideo}
+                         toggleAudio={this.props.toggleAudio}
+                />
                 {Object.entries(this.props.remoteVideos).map(video =>
                     <Wrapper videoId={video[0]}
                              src={video[1]}
                              isRemoteVideo={true}
-                             key={uniqueId()}/>
+                             key={uniqueId()}
+                             toggleVideo={this.props.toggleVideo}
+                             toggleAudio={this.props.toggleAudio}
+                    />
                 )}
             </div>
         )
@@ -36,6 +44,9 @@ export default class VideoController extends Component {
 }
 
 VideoController.propTypes = {
-    remoteVideos: PropTypes.object.isRequired
+    localUsername: PropTypes.string.isRequired,
+    remoteVideos: PropTypes.object.isRequired,
+    toggleAudio: PropTypes.func.isRequired,
+    toggleVideo: PropTypes.func.isRequired
 };
 

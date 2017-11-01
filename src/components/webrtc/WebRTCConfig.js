@@ -48,6 +48,9 @@ export default class KurentoConfig {
                     console.error('Unrecognized message', parsedMessage);
             }
         });
+
+        this.toggleVideo = this.toggleVideo.bind(this);
+        this.toggleAudio = this.toggleAudio.bind(this);
     }
 
     set section(section) {
@@ -95,7 +98,7 @@ export default class KurentoConfig {
         console.log(this.name + " registered in room " + this.room);
         const participant = new Participant(this.name, this.ws);
         this.participants[this.name] = participant;
-        const video = document.querySelector("#localVideo");
+        const video = document.querySelector(`#local_${this.name}`);
 
         const options = {
             localVideo: video,
@@ -168,5 +171,23 @@ export default class KurentoConfig {
     sendMessage(message) {
         console.log('Sending message: ' + message.id);
         this.ws.emit('message', message);
+    }
+
+    toggleAudio(name) {
+        const audioTracks = this.participants[name].rtcPeer.getLocalStream().getAudioTracks();
+
+        // if MediaStream has reference to microphone
+        if (audioTracks[0]) {
+            audioTracks[0].enabled = !audioTracks[0].enabled;
+        }
+    }
+
+    toggleVideo(name) {
+        const videoTracks = this.participants[name].rtcPeer.getLocalStream().getVideoTracks();
+
+        // if MediaStream has reference to web cam
+        if (videoTracks[0]) {
+            videoTracks[0].enabled = !videoTracks[0].enabled;
+        }
     }
 }

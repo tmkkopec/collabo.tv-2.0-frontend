@@ -6,7 +6,7 @@ class Video extends React.Component {
     render() {
         return (
             <MdlCell cellWidth={10}>
-                <video id={(this.props.isRemoteVideo ? 'remote_' : '') + this.props.videoId}
+                <video id={(this.props.isRemoteVideo ? 'remote_' : 'local_') + this.props.videoId}
                        src={this.props.src}
                        autoPlay/>
             </MdlCell>

@@ -37,7 +37,12 @@ class Section extends Component {
                             </div>
                         </MdlCell>
                         <MdlCell cellWidth={4}>
-                            <VideoController remoteVideos={this.state.remoteVideos}/>
+                            <VideoController
+                                localUsername={this.props.webrtc.name}
+                                remoteVideos={this.state.remoteVideos}
+                                toggleAudio={this.props.webrtc.toggleAudio}
+                                toggleVideo={this.props.webrtc.toggleVideo}
+                            />
                         </MdlCell>
                     </MdlGrid>
                 </div>
