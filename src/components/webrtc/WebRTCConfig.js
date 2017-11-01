@@ -173,8 +173,19 @@ export default class KurentoConfig {
         this.ws.emit('message', message);
     }
 
-    toggleAudio(name) {
-        const audioTracks = this.participants[name].rtcPeer.getLocalStream().getAudioTracks();
+    toggleAudio(name, isRemote) {
+        let audioTracks;
+        switch(isRemote) {
+            case true:
+                audioTracks = this.participants[name].rtcPeer.getRemoteStream().getAudioTracks();
+                break;
+            case false:
+                audioTracks = this.participants[name].rtcPeer.getLocalStream().getAudioTracks();
+                break;
+            default:
+                console.error('Argument \'isLocal\' is not an instance of boolean\'');
+                return;
+        }
 
         // if MediaStream has reference to microphone
         if (audioTracks[0]) {
@@ -182,8 +193,19 @@ export default class KurentoConfig {
         }
     }
 
-    toggleVideo(name) {
-        const videoTracks = this.participants[name].rtcPeer.getLocalStream().getVideoTracks();
+    toggleVideo(name, isRemote) {
+        let videoTracks;
+        switch(isRemote) {
+            case true:
+                videoTracks = this.participants[name].rtcPeer.getRemoteStream().getVideoTracks();
+                break;
+            case false:
+                videoTracks = this.participants[name].rtcPeer.getLocalStream().getVideoTracks();
+                break;
+            default:
+                console.error('Argument \'isLocal\' is not an instance of boolean\'');
+                return;
+        }
 
         // if MediaStream has reference to web cam
         if (videoTracks[0]) {
