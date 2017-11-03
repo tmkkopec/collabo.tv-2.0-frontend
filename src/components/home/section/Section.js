@@ -29,8 +29,17 @@ class Section extends Component {
         };
         Section.instance = this;
         this.changeVideo = this.changeVideo.bind(this)
+
+        this.onPlay=this.onPlay.bind(this);
+        this.onReady=this.onReady.bind(this);
+        this.onError=this.onError.bind(this);
+        this.onPause=this.onPause.bind(this);
+        this.onEnd=this.onEnd.bind(this);
+        this.onStateChange=this.onStateChange.bind(this);
+        this.onPlaybackRateChange=this.onPlaybackRateChange.bind(this);
+        this.onPlaybackQualityChange=this.onPlaybackQualityChange.bind(this);
+        this.handlePlay=this.handlePlay.bind(this);
     }
-		
     changeVideo(video) {
         this.setState({activeVideo: video})
     }
@@ -52,21 +61,31 @@ class Section extends Component {
   }	
 	
 	
-	 _onReady(event) {
-    // access to player in all event handlers via event.target
-	
-	channel = getChannel();
-	
-	player= event.target;
-	player.playVideo()
-	setTimeout(player.pauseVideo(), 2000);
+	onReady(event) {
+        console.log("onReady");
    	 
-  }
-   _onPlay(event) {
-    console.log("go");
-	
-	//this.state.player.playVideo();
-  }
+    }
+    onPlay(event) {
+        console.log("onPlay");
+    }
+    onError(event) {
+        console.log("onError");
+    }
+    onPause(event) {
+        console.log("onPause");
+    }
+    onEnd(event) {
+        console.log("onEnd");
+    }
+    onStateChange(event) {
+        console.log("onStateChange");
+    }
+    onPlaybackRateChange(event) {
+        console.log("onPlaybackRateChange");
+    }
+    onPlaybackQualityChange(event) {
+        console.log("onPlaybackQualityChange");
+    }
 	
 
     render() {
@@ -75,7 +94,9 @@ class Section extends Component {
       height: '1000',
       width: '1000',
       playerVars: { // https://developers.google.com/youtube/player_parameters
-        autoplay: 1
+        autoplay:1,
+        enablejsapi: 1,
+        origin:window.location.protocol+'//'+window.location.hostname+(window.location.port ? ':'+window.location.port: '')
       }
 	};
         const cellWidth = Math.max(12/(Object.keys(this.state.remoteVideos).length + 1), 6);
@@ -102,16 +123,15 @@ class Section extends Component {
 			<YouTube
        			 videoId={this.state.activeVideo}
         		opts={opts}
-        		onReady={this._onReady}
-			onPlay={this._onPlay}
-			
+        	onReady={this.onReady}
+            onPlay={this.onPlay}
+            onError={this.onError}
+            onPause={this.onPause}
+            onEnd={this.onEnd}
+            onStateChange={this.onStateChange}
+            onPlaybackRateChange={this.onPlaybackRateChange}
+            onPlaybackQualityChange={this.onPlaybackQualityChange}			
      			 />
-			{/*
-                            <div id="video">
-                                <iframe title="centerVideo"
-                                        src={"https://www.youtube.com/embed/" + this.state.activeVideo}/>
-                            </div>*/}
-				
 			 <button onClick={(e) => this.handlePause(e)}>
        			 PAUSE
       			</button>
