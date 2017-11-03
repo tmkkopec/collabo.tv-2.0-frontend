@@ -1,14 +1,68 @@
 import io from 'socket.io-client';
 import kurentoUtils from 'kurento-utils';
 import Participant from './Participant';
+import * as DC from 'datachannel';
+import {play,pause} from '../home/section/Section'; 
+var tmp; 
 
+export function getChannel() {
+  return tmp;
+}
 export default class KurentoConfig {
     constructor(room, name) {
         this.ws = io.connect(`https://${window.location.host}`);
         this.participants = {};
         this.name = name;
         this.room = room;
+	this.roomOwner=false;
+	
+	var channel = new window.DataChannel()
+	
+	
+ 	var onMessageCallbacks = {};
+	var soket=this.ws;
+	var CurrentRoom=this.room;
+	channel.openSignalingChannel = function (config) {
+	   var channel = config.channel || this.channel;
+	 onMessageCallbacks[channel] = config.onmessage;
 
+		if (config.onopen) setTimeout(config.onopen, 1000);
+		 return {
+		send: function (message) {
+		  	soket.emit('messageDC', {
+			sender: channel.userid,
+			channel: channel,
+			message: message
+		   });
+		},
+		channel: channel
+	 };
+	};
+	
+	channel.onopen = function() {
+	//alert("kanal otwarty");
+    	
+	};
+
+	channel.onmessage = function(msg){
+	
+	
+	console.log(msg);
+
+	switch(msg) {
+	    case '/play':
+		play();
+		break;
+	    case '/pause':
+		pause();
+		break;
+	    default:
+		console.log("nic");
+	}
+
+	}
+
+	
         window.onbeforeunload = () => {
             this.logout();
         };
@@ -16,6 +70,44 @@ export default class KurentoConfig {
         this.ws.on('connect', () => {
             console.log('ws connect success');
         });
+	
+	 this.ws.on('CreatedRoom', function(Owner) {
+            
+	    this.roomOwner=Owner;
+		if(this.roomOwner){
+		
+ 		channel.userid = CurrentRoom;		
+	  	channel.open(CurrentRoom);	
+		console.log(channel);	
+		
+		tmp=channel;
+		}
+		else{
+		channel.connect(CurrentRoom);
+		 /* channel.join({
+            		id: CurrentRoom,
+            		owner: CurrentRoom
+      		  });*/	
+		console.log(channel);
+		console.log(CurrentRoom);	
+		
+		}
+		tmp=channel;
+        });	
+	
+		
+					
+
+	 this.ws.on('messageDC', function(data) { 
+		console.log( 'messageDC ' + data);
+		if(data.sender == channel.userid) return;
+
+		if (onMessageCallbacks[data.channel]) {
+		onMessageCallbacks[data.channel](data.message);
+		 };
+		});
+
+	 
 
         this.ws.on('message', parsedMessage => {
             console.info('Received message: ' + parsedMessage.id);
@@ -62,6 +154,7 @@ export default class KurentoConfig {
         };
 
         this.sendMessage(message);
+	
     }
 
     onNewParticipant(request) {
