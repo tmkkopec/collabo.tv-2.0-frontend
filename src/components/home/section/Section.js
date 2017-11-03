@@ -25,7 +25,7 @@ class Section extends Component {
 
         this.state = {
             remoteVideos: {},
-            activeVideo: 'HSOtku1j600'
+            activeVideo: 'sJYBaaUVh20'
         };
         Section.instance = this;
         this.changeVideo = this.changeVideo.bind(this)
