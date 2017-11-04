@@ -4,82 +4,78 @@ import Video from './Video';
 import MdlGrid from '../../mdl/MdlGrid';
 import MdlCell from '../../mdl/MdlCell';
 import YouTube from 'react-youtube';
-import RTCconf from '../../webrtc/WebRTCConfig';
-import {getChannel} from '../../webrtc/WebRTCConfig'; // or './module'
-import * as DC from 'datachannel';
-
-
-
-export function setParams(Channel, Name, Room, Owner){
-	channel=Channel;
-	name=Name;
-	room=Room;
-    owner=Owner;
-}
-
-export function updateStatus(status){
-	var time = player.getCurrentTime();
-	if(time > status.time +1 || time < status.time -1 ){
-		if(player.getPlayerState() != 3){
-				player.seekTo(status.time);
-				console.log(status.time+ " " +time);	
-			}
-		}
-		
-	var state=player.getPlayerState()
-	if( state!== status.state){
-		console.log(status.state+ " " +state );
-		if (status.state == 1 && state == 2) player.playVideo();
-		if (status.state == 2 && state == 1) player.pauseVideo();
-		}
-
-	if(status.video){
-        player.loadVideoById(status.video);
-	}
-}
-
-
-
-function sendCurrentStatus() {
-	var state ={    
-		"name": player.getVideoUrl() ,
-		"time": player.getCurrentTime(),
-		"state": player.getPlayerState()
-	}
-	channel.send(state);
-}
-export function startSynchronize() {
-
-	if(owner){
-	interval = setInterval(sendCurrentStatus, 700);
-	}
-}
 const uniqueId = require('lodash/uniqueId');
-var channel;
-var name;
-var room;
-var owner;
-var player;
-var interval;
 
 class Section extends Component {
     constructor(props) {
         super(props);
-	
- 	
+
+        this.player = undefined;
+        this.interval = undefined;
 
         this.state = {
             remoteVideos: {},
-            activeVideo: 'GPqbZsyl-bs'
+            activeVideo: 'GPqbZsyl-bs',
+            channel: undefined,
+            name: undefined,
+            room: undefined,
+            owner: undefined
         };
         Section.instance = this;
-        this.changeVideo = this.changeVideo.bind(this)
+        this.changeVideo = this.changeVideo.bind(this);
+        this.sendCurrentStatus = this.sendCurrentStatus.bind(this);
+        this.startSynchronize = this.startSynchronize.bind(this);
+        this.updateStatus = this.updateStatus.bind(this);
     }
-		
+
     changeVideo(video) {
-	var newVideo ={'video' : video};
-	channel.send(newVideo);
+        this.state.channel.send({'video': video});
         this.setState({activeVideo: video});
+    }
+
+    startSynchronize() {
+        if (this.owner) {
+            this.interval = setInterval(this.sendCurrentStatus, 700);
+        }
+    }
+
+    sendCurrentStatus() {
+        const state = {
+            "name": this.player.getVideoUrl(),
+            "time": this.player.getCurrentTime(),
+            "state": this.player.getPlayerState()
+        };
+        this.state.channel.send(state);
+    }
+
+    updateStatus(status) {
+        const time = this.player.getCurrentTime();
+        if (time > status.time + 1 || time < status.time - 1) {
+            if (this.player.getPlayerState() !== 3) {
+                this.player.seekTo(status.time);
+                console.log(status.time + " " + time);
+            }
+        }
+
+        const state = this.player.getPlayerState();
+        if (state !== status.state) {
+            console.log(status.state + " " + state);
+            if (status.state === 1 && state === 2) this.player.playVideo();
+            if (status.state === 2 && state === 1) this.player.pauseVideo();
+        }
+
+        if (status.video) {
+            this.player.loadVideoById(status.video);
+        }
+    }
+
+    _onReady(event) {
+        this.player = event.target;
+        this.player.playVideo();
+    }
+
+    _onPlay(event) {
+        console.log("go");
     }
 
     componentDidMount() {
@@ -87,31 +83,19 @@ class Section extends Component {
         this.props.webrtc.register();
     }
 
-	
-	
-	 _onReady(event) {
-		
-    player= event.target;
-    player.playVideo();
-    this.forceUpdate();
-   	 
-  }
-   _onPlay(event) {
-    console.log("go");
-	  }
-	
-
     render() {
-	const opts = {
-      height: '360',
-      width: '480',
-      playerVars: { 
- 	    autoplay:1,
-        enablejsapi: 1, 
-        origin:window.location.protocol+'//'+window.location.hostname+(window.location.port ? ':'+window.location.port: '')
-      }
-	};
-        const cellWidth = Math.max(12/(Object.keys(this.state.remoteVideos).length + 1), 6);
+        const opts = {
+            height: '360',
+            width: '480',
+            playerVars: {
+                autoplay: 0,
+                enablejsapi: 1,
+                origin: `${window.location.protocol}'//'${window.location.host}`,
+                controls: this.state.owner === false ? 0 : 1
+            }
+        };
+        const cellWidth = Math.max(12 / (Object.keys(this.state.remoteVideos).length + 1), 6);
+
         return (
             <section className="mdl-layout__tab-panel is-active" id={'scroll-tab-' + this.props.id}>
                 <div className="page-content">
@@ -130,15 +114,14 @@ class Section extends Component {
                                 </MdlGrid>
                             </div>
                         </MdlCell>
-                        <MdlCell cellWidth={6} id="videoCell" style={owner? {'pointerEvents':'auto'} : {'pointerEvents':'none'}}>
-
-			<YouTube
-       			 videoId={this.state.activeVideo}
-        		opts={opts}
-        		onReady={this._onReady}
-			onPlay={this._onPlay}
-			
-     			 />
+                        <MdlCell cellWidth={6}
+                                 style={this.state.owner === false ? {'pointerEvents': 'none'} : {'pointerEvents': 'auto'}}>
+                            <YouTube
+                                videoId={this.state.activeVideo}
+                                opts={opts}
+                                onReady={this._onReady}
+                                onPlay={this._onPlay}
+                            />
                         </MdlCell>
                     </MdlGrid>
                 </div>
@@ -146,6 +129,7 @@ class Section extends Component {
         )
     }
 }
+
 Section.propTypes = {
     id: PropTypes.string.isRequired,
     webrtc: PropTypes.object.isRequired
