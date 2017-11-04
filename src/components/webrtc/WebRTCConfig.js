@@ -2,7 +2,7 @@ import io from 'socket.io-client';
 import kurentoUtils from 'kurento-utils';
 import Participant from './Participant';
 import * as DC from 'datachannel';
-import {play,pause} from '../home/section/Section'; 
+import {play,pause,setParams,startSynchronize,updateStatus} from '../home/section/Section'; 
 var tmp; 
 
 export function getChannel() {
@@ -14,7 +14,7 @@ export default class KurentoConfig {
         this.participants = {};
         this.name = name;
         this.room = room;
-	this.roomOwner=false;
+	var roomOwner=false;
 	
 	var channel = new window.DataChannel()
 	
@@ -41,14 +41,15 @@ export default class KurentoConfig {
 	
 	channel.onopen = function() {
 	//alert("kanal otwarty");
-    	
+	setParams(channel,name,room,roomOwner)
+    	startSynchronize();
 	};
 
 	channel.onmessage = function(msg){
 	
 	
-	console.log(msg);
-
+	//console.log(msg);
+	updateStatus(msg);
 	switch(msg) {
 	    case '/play':
 		play();
@@ -57,7 +58,7 @@ export default class KurentoConfig {
 		pause();
 		break;
 	    default:
-		console.log("nic");
+		//console.log("nic");
 	}
 
 	}
@@ -73,8 +74,8 @@ export default class KurentoConfig {
 	
 	 this.ws.on('CreatedRoom', function(Owner) {
             
-	    this.roomOwner=Owner;
-		if(this.roomOwner){
+	    roomOwner=Owner;
+		if(roomOwner){
 		
  		channel.userid = CurrentRoom;		
 	  	channel.open(CurrentRoom);	
