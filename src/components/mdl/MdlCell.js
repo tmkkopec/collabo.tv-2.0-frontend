@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 export default class MdlCell extends Component {
     render() {
         return (
-            <div className={'mdl-cell mdl-cell--' + this.props.cellWidth + '-col'}>
+            <div className={'mdl-cell mdl-cell--' + this.props.cellWidth + '-col'} style={this.props.style}>
                 {this.props.children}
             </div>
         )
@@ -12,5 +12,6 @@ export default class MdlCell extends Component {
 }
 
 MdlCell.propTypes = {
-    cellWidth: PropTypes.number.isRequired
+    cellWidth: PropTypes.number.isRequired,
+    style: PropTypes.object
 };

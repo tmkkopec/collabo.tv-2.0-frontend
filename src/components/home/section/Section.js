@@ -11,21 +11,13 @@ import * as DC from 'datachannel';
 
 
 export function setParams(Channel, Name, Room, Owner){
-	/*	
-	console.log(Channel);	
-	console.log(Name);
-	console.log(Room);
-	console.log(Owner);*/
 	channel=Channel;
 	name=Name;
 	room=Room;
-	owner=Owner;
+    owner=Owner;
 }
 
 export function updateStatus(status){
-	/*if(player.getVideoUrl() !== status.name){
-		console.log(status.name +" " +player.getVideoUrl());
-		}*/
 	var time = player.getCurrentTime();
 	if(time > status.time +1 || time < status.time -1 ){
 		if(player.getPlayerState() != 3){
@@ -42,24 +34,22 @@ export function updateStatus(status){
 		}
 
 	if(status.video){
-		player.loadVideoById(status.video);
+        player.loadVideoById(status.video);
 	}
 }
 
 
 
 function sendCurrentStatus() {
-	var state ={
+	var state ={    
 		"name": player.getVideoUrl() ,
 		"time": player.getCurrentTime(),
 		"state": player.getPlayerState()
 	}
-	//channel.send(player.getCurrentTime());
-	//channel.send(player.getVideoUrl());
-	//channel.send(player.getPlayerState());
 	channel.send(state);
 }
 export function startSynchronize() {
+
 	if(owner){
 	interval = setInterval(sendCurrentStatus, 700);
 	}
@@ -100,29 +90,25 @@ class Section extends Component {
 	
 	
 	 _onReady(event) {
-    // access to player in all event handlers via event.target
-	
-	//channel = getChannel();
-	
-	player= event.target;
-	player.playVideo()
-	//setTimeout(player.pauseVideo(), 2000);
+		
+    player= event.target;
+    player.playVideo();
+    this.forceUpdate();
    	 
   }
    _onPlay(event) {
     console.log("go");
-	
-	//this.state.player.playVideo();
-  }
+	  }
 	
 
     render() {
-
 	const opts = {
       height: '360',
       width: '480',
-      playerVars: { // https://developers.google.com/youtube/player_parameters
-        autoplay: 1
+      playerVars: { 
+ 	    autoplay:1,
+        enablejsapi: 1, 
+        origin:window.location.protocol+'//'+window.location.hostname+(window.location.port ? ':'+window.location.port: '')
       }
 	};
         const cellWidth = Math.max(12/(Object.keys(this.state.remoteVideos).length + 1), 6);
@@ -144,7 +130,7 @@ class Section extends Component {
                                 </MdlGrid>
                             </div>
                         </MdlCell>
-                        <MdlCell cellWidth={6}>
+                        <MdlCell cellWidth={6} id="videoCell" style={owner? {'pointerEvents':'auto'} : {'pointerEvents':'none'}}>
 
 			<YouTube
        			 videoId={this.state.activeVideo}
@@ -153,13 +139,6 @@ class Section extends Component {
 			onPlay={this._onPlay}
 			
      			 />
-			{/*
-                            <div id="video">
-                                <iframe title="centerVideo"
-                                        src={"https://www.youtube.com/embed/" + this.state.activeVideo}/>
-                            </div>*/}
-				
-			
                         </MdlCell>
                     </MdlGrid>
                 </div>
@@ -167,10 +146,6 @@ class Section extends Component {
         )
     }
 }
-
-
-//player=YouTube.player;
-
 Section.propTypes = {
     id: PropTypes.string.isRequired,
     webrtc: PropTypes.object.isRequired
