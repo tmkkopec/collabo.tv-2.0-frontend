@@ -8,15 +8,70 @@ import RTCconf from '../../webrtc/WebRTCConfig';
 import {getChannel} from '../../webrtc/WebRTCConfig'; // or './module'
 import * as DC from 'datachannel';
 
-export function play() {
-     player.playVideo();
+
+
+export function setParams(Channel, Name, Room, Owner){
+	/*	
+	console.log(Channel);	
+	console.log(Name);
+	console.log(Room);
+	console.log(Owner);*/
+	channel=Channel;
+	name=Name;
+	room=Room;
+	owner=Owner;
 }
-export function pause() {
-     player.pauseVideo();
+
+export function updateStatus(status){
+	/*if(player.getVideoUrl() !== status.name){
+		console.log(status.name +" " +player.getVideoUrl());
+		}*/
+	var time = player.getCurrentTime();
+	if(time > status.time +1 || time < status.time -1 ){
+		if(player.getPlayerState() != 3){
+				player.seekTo(status.time);
+				console.log(status.time+ " " +time);	
+			}
+		}
+		
+	var state=player.getPlayerState()
+	if( state!== status.state){
+		console.log(status.state+ " " +state );
+		if (status.state == 1 && state == 2) player.playVideo();
+		if (status.state == 2 && state == 1) player.pauseVideo();
+		}
+
+	if(status.video){
+		player.loadVideoById(status.video);
+	}
+}
+
+
+
+function sendCurrentStatus() {
+	var state ={
+		"name": player.getVideoUrl() ,
+		"time": player.getCurrentTime(),
+		"state": player.getPlayerState()
+	}
+	//channel.send(player.getCurrentTime());
+	//channel.send(player.getVideoUrl());
+	//channel.send(player.getPlayerState());
+	channel.send(state);
+}
+export function startSynchronize() {
+	if(owner){
+	interval = setInterval(sendCurrentStatus, 700);
+	}
 }
 const uniqueId = require('lodash/uniqueId');
 var channel;
+var name;
+var room;
+var owner;
 var player;
+var interval;
+
 class Section extends Component {
     constructor(props) {
         super(props);
@@ -25,78 +80,49 @@ class Section extends Component {
 
         this.state = {
             remoteVideos: {},
-            activeVideo: 'sJYBaaUVh20'
+            activeVideo: 'GPqbZsyl-bs'
         };
         Section.instance = this;
         this.changeVideo = this.changeVideo.bind(this)
-
-        this.onPlay=this.onPlay.bind(this);
-        this.onReady=this.onReady.bind(this);
-        this.onError=this.onError.bind(this);
-        this.onPause=this.onPause.bind(this);
-        this.onEnd=this.onEnd.bind(this);
-        this.onStateChange=this.onStateChange.bind(this);
-        this.onPlaybackRateChange=this.onPlaybackRateChange.bind(this);
-        this.onPlaybackQualityChange=this.onPlaybackQualityChange.bind(this);
-        this.handlePlay=this.handlePlay.bind(this);
     }
+		
     changeVideo(video) {
-        this.setState({activeVideo: video})
+	var newVideo ={'video' : video};
+	channel.send(newVideo);
+        this.setState({activeVideo: video});
     }
 
     componentDidMount() {
         this.props.webrtc.section = this;
         this.props.webrtc.register();
     }
-    handlePause() {
-	
-      channel.send('/pause');
-	pause();
-	 
-  }
-    handlePlay() {
-    	channel.send('/play');
-	play();
- 	
-  }	
+
 	
 	
-	onReady(event) {
-        console.log("onReady");
+	 _onReady(event) {
+    // access to player in all event handlers via event.target
+	
+	//channel = getChannel();
+	
+	player= event.target;
+	player.playVideo()
+	//setTimeout(player.pauseVideo(), 2000);
    	 
-    }
-    onPlay(event) {
-        console.log("onPlay");
-    }
-    onError(event) {
-        console.log("onError");
-    }
-    onPause(event) {
-        console.log("onPause");
-    }
-    onEnd(event) {
-        console.log("onEnd");
-    }
-    onStateChange(event) {
-        console.log("onStateChange");
-    }
-    onPlaybackRateChange(event) {
-        console.log("onPlaybackRateChange");
-    }
-    onPlaybackQualityChange(event) {
-        console.log("onPlaybackQualityChange");
-    }
+  }
+   _onPlay(event) {
+    console.log("go");
+	
+	//this.state.player.playVideo();
+  }
 	
 
     render() {
 
 	const opts = {
-      height: '1000',
-      width: '1000',
+      height: '360',
+      width: '480',
       playerVars: { // https://developers.google.com/youtube/player_parameters
-        autoplay:1,
-        enablejsapi: 1,
-        origin:window.location.protocol+'//'+window.location.hostname+(window.location.port ? ':'+window.location.port: '')
+        autoplay: 1
       }
 	};
         const cellWidth = Math.max(12/(Object.keys(this.state.remoteVideos).length + 1), 6);
@@ -123,21 +149,17 @@ class Section extends Component {
 			<YouTube
        			 videoId={this.state.activeVideo}
         		opts={opts}
-        	onReady={this.onReady}
-            onPlay={this.onPlay}
-            onError={this.onError}
-            onPause={this.onPause}
-            onEnd={this.onEnd}
-            onStateChange={this.onStateChange}
-            onPlaybackRateChange={this.onPlaybackRateChange}
-            onPlaybackQualityChange={this.onPlaybackQualityChange}			
+        		onReady={this._onReady}
+			onPlay={this._onPlay}
+			
      			 />
-			 <button onClick={(e) => this.handlePause(e)}>
-       			 PAUSE
-      			</button>
-			 <button onClick={(e) => this.handlePlay(e)}>
-      			 PLAY
-     			 </button>
+			{/*
+                            <div id="video">
+                                <iframe title="centerVideo"
+                                        src={"https://www.youtube.com/embed/" + this.state.activeVideo}/>
+                            </div>*/}
+				
+			
                         </MdlCell>
                     </MdlGrid>
                 </div>
@@ -147,7 +169,7 @@ class Section extends Component {
 }
 
 
-player=YouTube.player;
+//player=YouTube.player;
 
 Section.propTypes = {
     id: PropTypes.string.isRequired,
