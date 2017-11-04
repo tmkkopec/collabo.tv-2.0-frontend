@@ -2,7 +2,7 @@ import io from 'socket.io-client';
 import kurentoUtils from 'kurento-utils';
 import Participant from './Participant';
 import * as DC from 'datachannel';
-import {play,pause,setParams,startSynchronize,updateStatus} from '../home/section/Section'; 
+import {setParams,startSynchronize,updateStatus} from '../home/section/Section'; 
 var tmp; 
 
 export function getChannel() {
@@ -50,16 +50,7 @@ export default class KurentoConfig {
 	
 	//console.log(msg);
 	updateStatus(msg);
-	switch(msg) {
-	    case '/play':
-		play();
-		break;
-	    case '/pause':
-		pause();
-		break;
-	    default:
-		//console.log("nic");
-	}
+	
 
 	}
 

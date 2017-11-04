@@ -96,22 +96,7 @@ class Section extends Component {
         this.props.webrtc.section = this;
         this.props.webrtc.register();
     }
-    handlePause() {
-	
-      channel.send('/pause');
-	pause();
-	 
-  }
-    handlePlay() {
-    	channel.send('/play');
-	play();
- 	
-  }	
-	handleSwitch(){
-	player.loadVideoById('JZEFzhWDfnw');
-	   
-	    
-  }
+
 	
 	
 	 _onReady(event) {
