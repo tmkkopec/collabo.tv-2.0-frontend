@@ -9,7 +9,7 @@ export default class KurentoConfig {
         this.participants = {};
         this.name = name;
         this.room = room;
-        this.roomOwner = undefined;
+        this.roomOwner = false;
         this.channel = new window.DataChannel();
 
         var onMessageCallbacks = {};
@@ -32,19 +32,14 @@ export default class KurentoConfig {
             };
         };
 
-        this.channel.onopen = function () {
+        this.channel.onopen = () => {
             this._section.startSynchronize()
         };
 
-        this.channel.onmessage = function (msg) {
-
-
+        this.channel.onmessage = msg => {
             //console.log(msg);
             this._section.updateStatus(msg);
-
-
-        }
-
+        };
 
         window.onbeforeunload = () => {
             this.logout();
@@ -54,7 +49,7 @@ export default class KurentoConfig {
             console.log('ws connect success');
         });
 
-        this.ws.on('CreatedRoom', (Owner) => {
+        this.ws.on('CreatedRoom', Owner => {
             this.roomOwner = Owner;
             if (this.roomOwner) {
                 this.channel.userid = CurrentRoom;
@@ -76,7 +71,7 @@ export default class KurentoConfig {
         });
 
 
-        this.ws.on('messageDC', (data) => {
+        this.ws.on('messageDC', data => {
             console.log('messageDC ' + data);
             if (data.sender === this.channel.userid) return;
 
