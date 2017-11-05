@@ -22,6 +22,7 @@ class Section extends Component {
             owner: undefined
         };
         Section.instance = this;
+        this._onReady = this._onReady.bind(this);
         this.changeVideo = this.changeVideo.bind(this);
         this.sendCurrentStatus = this.sendCurrentStatus.bind(this);
         this.startSynchronize = this.startSynchronize.bind(this);
@@ -34,7 +35,7 @@ class Section extends Component {
     }
 
     startSynchronize() {
-        if (this.owner) {
+        if (this.state.owner === true) {
             this.interval = setInterval(this.sendCurrentStatus, 700);
         }
     }
