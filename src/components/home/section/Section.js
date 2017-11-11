@@ -3,21 +3,82 @@ import PropTypes from 'prop-types';
 import MdlGrid from '../../mdl/MdlGrid';
 import MdlCell from '../../mdl/MdlCell';
 import VideoController from "../video/VideoController";
+import YouTube from 'react-youtube';
+
+
+const uniqueId = require('lodash/uniqueId');
 
 class Section extends Component {
     constructor(props) {
         super(props);
 
+        this.player = undefined;
+        this.interval = undefined;
+
         this.state = {
             remoteVideos: {},
-            activeVideo: 'Qmn2bhY07NQ'
+            activeVideo: 'GPqbZsyl-bs',
+            channel: undefined,
+            name: undefined,
+            room: undefined,
+            owner: undefined
         };
         Section.instance = this;
-        this.changeVideo = this.changeVideo.bind(this)
+        this._onReady = this._onReady.bind(this);
+        this.changeVideo = this.changeVideo.bind(this);
+        this.sendCurrentStatus = this.sendCurrentStatus.bind(this);
+        this.startSynchronize = this.startSynchronize.bind(this);
+        this.updateStatus = this.updateStatus.bind(this);
     }
 
     changeVideo(video) {
-        this.setState({activeVideo: video})
+        this.state.channel.send({'video': video});
+        this.setState({activeVideo: video});
+    }
+
+    startSynchronize() {
+        if (this.state.owner === true) {
+            this.interval = setInterval(this.sendCurrentStatus, 700);
+        }
+    }
+
+    sendCurrentStatus() {
+        const state = {
+            "name": this.player.getVideoUrl(),
+            "time": this.player.getCurrentTime(),
+            "state": this.player.getPlayerState()
+        };
+        this.state.channel.send(state);
+    }
+
+    updateStatus(status) {
+        const time = this.player.getCurrentTime();
+        if (time > status.time + 1 || time < status.time - 1) {
+            if (this.player.getPlayerState() !== 3) {
+                this.player.seekTo(status.time);
+                console.log(status.time + " " + time);
+            }
+        }
+
+        const state = this.player.getPlayerState();
+        if (state !== status.state) {
+            console.log(status.state + " " + state);
+            if (status.state === 1 && state === 2) this.player.playVideo();
+            if (status.state === 2 && state === 1) this.player.pauseVideo();
+        }
+
+        if (status.video) {
+            this.player.loadVideoById(status.video);
+        }
+    }
+
+    _onReady(event) {
+        this.player = event.target;
+        this.player.playVideo();
+    }
+
+    _onPlay(event) {
+        console.log("go");
     }
 
     componentDidMount() {
@@ -26,15 +87,30 @@ class Section extends Component {
     }
 
     render() {
+        const opts = {
+            height: '360',
+            width: '480',
+            playerVars: {
+                autoplay: 0,
+                enablejsapi: 1,
+                origin: `${window.location.protocol}'//'${window.location.host}`,
+                controls: this.state.owner === false ? 0 : 1
+            }
+        };
+        const cellWidth = Math.max(12 / (Object.keys(this.state.remoteVideos).length + 1), 6);
+
         return (
             <section className="mdl-layout__tab-panel is-active full-screen" id={'scroll-tab-' + this.props.id}>
                 <div className="page-content full-screen">
                     <MdlGrid className={'full-screen'}>
-                        <MdlCell cellWidth={8}>
-                            <div id="video">
-                                <iframe title="centerVideo"
-                                        src={"https://www.youtube.com/embed/" + this.state.activeVideo}/>
-                            </div>
+                        <MdlCell cellWidth={8}
+                                 style={this.state.owner === false ? {'pointerEvents': 'none'} : {'pointerEvents': 'auto'}}>
+                            <YouTube
+                                videoId={this.state.activeVideo}
+                                opts={opts}
+                                onReady={this._onReady}
+                                onPlay={this._onPlay}
+                            />
                         </MdlCell>
                         <MdlCell cellWidth={4}>
                             <VideoController
