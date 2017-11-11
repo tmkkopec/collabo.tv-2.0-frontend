@@ -12,17 +12,17 @@ export default class KurentoConfig {
         this.roomOwner = false;
         this.channel = new window.DataChannel();
 
-        var onMessageCallbacks = {};
-        var soket = this.ws;
-        var CurrentRoom = this.room;
+        let onMessageCallbacks = {};
+        let socket = this.ws;
+        let CurrentRoom = this.room;
         this.channel.openSignalingChannel = function (config) {
-            var channel = config.channel || this.channel;
+            let channel = config.channel || this.channel;
             onMessageCallbacks[channel] = config.onmessage;
 
             if (config.onopen) setTimeout(config.onopen, 1000);
             return {
                 send: function (message) {
-                    soket.emit('messageDC', {
+                    socket.emit('messageDC', {
                         sender: channel.userid,
                         channel: channel,
                         message: message

@@ -6,8 +6,6 @@ import VideoController from "../video/VideoController";
 import YouTube from 'react-youtube';
 
 
-const uniqueId = require('lodash/uniqueId');
-
 class Section extends Component {
     constructor(props) {
         super(props);
@@ -17,7 +15,7 @@ class Section extends Component {
 
         this.state = {
             remoteVideos: {},
-            activeVideo: 'GPqbZsyl-bs',
+            activeVideo: 'VZzFEHqSddU',
             channel: undefined,
             name: undefined,
             room: undefined,
@@ -77,10 +75,6 @@ class Section extends Component {
         this.player.playVideo();
     }
 
-    _onPlay(event) {
-        console.log("go");
-    }
-
     componentDidMount() {
         this.props.webrtc.section = this;
         this.props.webrtc.register();
@@ -88,8 +82,8 @@ class Section extends Component {
 
     render() {
         const opts = {
-            height: '360',
-            width: '480',
+            height: '450',
+            width: '800',
             playerVars: {
                 autoplay: 0,
                 enablejsapi: 1,
@@ -97,22 +91,20 @@ class Section extends Component {
                 controls: this.state.owner === false ? 0 : 1
             }
         };
-        const cellWidth = Math.max(12 / (Object.keys(this.state.remoteVideos).length + 1), 6);
 
         return (
             <section className="mdl-layout__tab-panel is-active full-screen" id={'scroll-tab-' + this.props.id}>
                 <div className="page-content full-screen">
                     <MdlGrid className={'full-screen'}>
-                        <MdlCell cellWidth={8}
+                        <MdlCell cellWidth={7}
                                  style={this.state.owner === false ? {'pointerEvents': 'none'} : {'pointerEvents': 'auto'}}>
                             <YouTube
                                 videoId={this.state.activeVideo}
                                 opts={opts}
                                 onReady={this._onReady}
-                                onPlay={this._onPlay}
                             />
                         </MdlCell>
-                        <MdlCell cellWidth={4}>
+                        <MdlCell cellWidth={5}>
                             <VideoController
                                 localUsername={this.props.webrtc.name}
                                 remoteVideos={this.state.remoteVideos}
