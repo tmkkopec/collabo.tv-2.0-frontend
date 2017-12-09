@@ -193,6 +193,14 @@ export default class KurentoConfig {
             id: 'leaveRoom'
         });
 
+        if (this.roomOwner === true) {
+            for (let key in this.participants)
+                if (key !== this.name) {
+                    this._section.setNewRoomOwner(key);
+                    break;
+                }
+        }
+
         for (let key in this.participants) {
             this.participants[key].dispose();
         }

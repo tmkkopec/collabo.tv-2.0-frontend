@@ -22,11 +22,16 @@ class Section extends Component {
             owner: undefined
         };
         Section.instance = this;
+
         this._onReady = this._onReady.bind(this);
         this.changeVideo = this.changeVideo.bind(this);
         this.sendCurrentStatus = this.sendCurrentStatus.bind(this);
         this.startSynchronize = this.startSynchronize.bind(this);
         this.updateStatus = this.updateStatus.bind(this);
+        this.updateVideoTime = this.updateVideoTime.bind(this);
+        this.updateVideoState = this.updateVideoState.bind(this);
+        this.updateVideo = this.updateVideo.bind(this);
+        this.updateOwner = this.updateOwner.bind(this);
     }
 
     changeVideo(video) {
@@ -42,32 +47,68 @@ class Section extends Component {
 
     sendCurrentStatus() {
         const state = {
-            "name": this.player.getVideoUrl(),
-            "time": this.player.getCurrentTime(),
-            "state": this.player.getPlayerState()
+            'time': this.player.getCurrentTime(),
+            'state': this.player.getPlayerState()
         };
         this.state.channel.send(state);
     }
 
-    updateStatus(status) {
+    updateVideoTime(newTime) {
         const time = this.player.getCurrentTime();
-        if (time > status.time + 1 || time < status.time - 1) {
+        if (time > newTime + 1 || time < newTime - 1) {
             if (this.player.getPlayerState() !== 3) {
-                this.player.seekTo(status.time);
-                console.log(status.time + " " + time);
+                this.player.seekTo(newTime);
+                console.log(newTime + " " + time);
             }
         }
+    }
 
+    updateVideoState(newState) {
         const state = this.player.getPlayerState();
-        if (state !== status.state) {
-            console.log(status.state + " " + state);
-            if (status.state === 1 && state === 2) this.player.playVideo();
-            if (status.state === 2 && state === 1) this.player.pauseVideo();
+        if (state !== newState) {
+            console.log(newState + " " + state);
+            if (newState === 1 && state === 2) this.player.playVideo();
+            if (newState === 2 && state === 1) this.player.pauseVideo();
         }
+    }
 
-        if (status.video) {
-            this.player.loadVideoById(status.video);
+    updateVideo(newVideo) {
+        this.player.loadVideoById(newVideo);
+    }
+
+    updateOwner(newOwner) {
+        if (this.state.name === newOwner) {
+            // this.setState({owner: true}, () => this.startSynchronize());
         }
+    }
+
+    updateStatus(status) {
+        Object.entries(status).forEach(obj => {
+            const key = obj[0];
+            const value = obj[1];
+
+            switch (key) {
+                case 'time':
+                    this.updateVideoTime(value);
+                    break;
+                case 'state':
+                    this.updateVideoState(value);
+                    break;
+                case 'video':
+                    this.updateVideo(value);
+                    break;
+                case 'owner':
+                    this.updateOwner(value);
+                    break;
+                default:
+                    console.error(`Unhandled status key, value pair: {${key}: ${value}}`);
+                    break;
+            }
+        });
+    }
+
+    setNewRoomOwner(newOwnerName) {
+        this.state.channel.send({'owner': newOwnerName});
     }
 
     _onReady(event) {
@@ -85,10 +126,11 @@ class Section extends Component {
             height: '450',
             width: '800',
             playerVars: {
-                autoplay: 0,
+                autoplay: 1,
                 enablejsapi: 1,
                 origin: `${window.location.protocol}'//'${window.location.host}`,
-                controls: this.state.owner === false ? 0 : 1
+                controls: this.state.owner === false ? 0 : 1,
+                showinfo: 0
             }
         };
 
