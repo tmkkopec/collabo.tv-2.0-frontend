@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import MdlGrid from '../../mdl/MdlGrid';
 import MdlCell from '../../mdl/MdlCell';
-import VideoController from "../video/VideoController";
+import VideoController from '../video/VideoController';
+import UserTable from '../usersPanel/UsersTable';
 import YouTube from 'react-youtube';
 
 
@@ -154,6 +155,12 @@ class Section extends Component {
                                 toggleVideo={this.props.webrtc.toggleVideo}
                             />
                         </MdlCell>
+                    </MdlGrid>
+                    <MdlGrid>
+                        {this.state.owner === true ?
+                            <UserTable remoteUsers={Object.keys(this.state.remoteVideos)} channel={this.state.channel}/> :
+                            <p>Not an owner</p>
+                        }
                     </MdlGrid>
                 </div>
             </section>

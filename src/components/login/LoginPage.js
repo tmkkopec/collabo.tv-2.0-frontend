@@ -33,12 +33,12 @@ class LoginPage extends Component {
         return (
             <div>
                 <MdlGrid>
-                    <MdlCell cellWidth={12}>
+                    <MdlCell cellWidth={12} style={{'text-align': 'center'}}>
                         <h3 className="mdl-typography--display-4 mdl-color-text--grey-600">Collabo.tv</h3>
                     </MdlCell>
                 </MdlGrid>
                 <MdlGrid>
-                    <MdlCell cellWidth={12}>
+                    <MdlCell cellWidth={12} style={{'text-align': 'center'}}>
                         <form method="GET" name="login_form" onSubmit={this.validateInput}>
                             <div id="form_div" className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                                 <label className="mdl-textfield__label" htmlFor="nickname">nickname@room</label>
