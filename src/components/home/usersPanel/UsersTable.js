@@ -60,8 +60,7 @@ export default class UsersTable extends Component {
                     </tr>
                     </thead>
                     <tbody>
-                    <UserRow username={'melo'} onChange={() => this.selectUser('melo')}/>
-                    {Object.entries(this.props.remoteUsers).map(username =>
+                    {this.props.remoteUsers.map(username =>
                         <UserRow username={username} onChange={() => this.selectUser(username)}/>)
                     }
                     </tbody>

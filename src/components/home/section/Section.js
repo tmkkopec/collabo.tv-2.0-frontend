@@ -136,8 +136,8 @@ class Section extends Component {
         };
 
         return (
-            <section className="mdl-layout__tab-panel is-active full-screen" id={'scroll-tab-' + this.props.id}>
-                <div className="page-content full-screen">
+            <section className="mdl-layout__tab-panel is-active" id={'scroll-tab-' + this.props.id}>
+                <div className="page-content">
                     <MdlGrid className={'full-screen'}>
                         <MdlCell cellWidth={7}
                                  style={this.state.owner === false ? {'pointerEvents': 'none'} : {'pointerEvents': 'auto'}}>
