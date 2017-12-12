@@ -19,13 +19,46 @@ video {
 
 .participantsVideos video {
     float: right;
+    border-radius: 100px;
 }
 
 .mdl-layout__drawer {
+    background-color: #81dfa0;
     width: 500px;
     left: -250px;
 }
 
 .mdl-layout__drawer.is-visible {
     left: 0;
+}
+
+.collabo-background{
+    background: linear-gradient(#b2ebc7,#ebfaf0);
+}
+
+.collabo-header{
+    background-color: #81dfa0;
+}
+
+.mdl-layout__header{
+    background-color: #81dfa0;
+}
+
+.mdl-layout_tab-bar-container{
+    background-color: #81dfa0;
+}
+
+.collabo-rect{
+    border-radius: 25px;
+    background: #78b7d0;
+}
+
+.collabo-video{
+    border: 15px #81dfa0;
+    border-radius: 25px;
+    background-color: #81dfa0;
+}
+
+.mdl-button--colored{
+    background: #78b7d0;
 }

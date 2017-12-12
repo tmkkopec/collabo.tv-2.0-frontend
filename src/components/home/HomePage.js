@@ -29,7 +29,7 @@ export default class HomePage extends Component {
 
     render() {
         return (
-            <div className="mdl-layout mdl-js-layout mdl-layout--fixed-tabs mdl-layout--fixed-header">
+            <div className="collabo-background mdl-layout mdl-js-layout mdl-layout--fixed-tabs mdl-layout--fixed-header">
                 <Header onLogout={this.onLogout} roomIDs={this.roomIDs}/>
                 <Drawer/>
                 <SectionsController sectionIDs={this.roomIDs} webrtc={this.webrtc}/>

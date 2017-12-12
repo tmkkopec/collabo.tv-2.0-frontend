@@ -141,11 +141,13 @@ class Section extends Component {
                     <MdlGrid className={'full-screen'}>
                         <MdlCell cellWidth={7}
                                  style={this.state.owner === false ? {'pointerEvents': 'none'} : {'pointerEvents': 'auto'}}>
+                                 <div className="collabo-video">
                             <YouTube
                                 videoId={this.state.activeVideo}
                                 opts={opts}
                                 onReady={this._onReady}
                             />
+                            </div>
                         </MdlCell>
                         <MdlCell cellWidth={5}>
                             <VideoController
