@@ -9,9 +9,10 @@ export default class KurentoConfig {
         this.participants = {};
         this.name = name;
         this.room = room;
+	this.ownerName = room;
         this.roomOwner = false;
         this.channel = new window.DataChannel();
-
+	this.channel.userid = this.name;
         let onMessageCallbacks = {};
         let socket = this.ws;
         let CurrentRoom = this.room;
@@ -31,14 +32,78 @@ export default class KurentoConfig {
                 channel: channel
             };
         };
-
+	//jakos trzeba zmienic bo nie dzialalo w tej funkcji
+	var dupa=this.channel;
+	var dupa2=this.room;
+	var dupa3=this.name;
         this.channel.onopen = () => {
-            this._section.startSynchronize()
-        };
+            if( this.roomOwner ) this._section.startSynchronize()
+		
+		else{
+		console.log("zapytaj o film");
+		
+		setTimeout(function(){
+			console.log(dupa3);
 
+			 const msg = {
+          		 "getVideo" : true,
+			"user" : dupa3 
+          		 };
+			dupa.send(msg)
+			
+			
+			
+		}, 10);
+		//
+		}
+        };
+       
+	
         this.channel.onmessage = msg => {
-            //console.log(msg);
-            this._section.updateStatus(msg);
+            
+		if(msg.time || msg.video){ 
+		//console.log("ODEBRANO");
+		//console.log(msg);           	
+		this._section.updateStatus(msg);
+		
+		}
+		else if(msg.kick)	
+		{console.log(msg.kick);
+
+		 this.logout();
+		}
+		
+
+		
+		
+		else if(msg.remoteControl){
+				
+				this._section.controlFromRemote(msg)		
+			}
+	  
+		else if(msg.changeUserAllow){
+				
+				this._section.changeAllow(msg)		
+			}
+		
+
+		else if(msg.getVideo){
+				
+				this._section.sendVideo(msg)		
+		}	
+		
+		else if(msg.changeOwner){
+				
+				this._section.changOwnerName(msg)		
+		}
+		
+           	else if(msg.newOwner){
+				
+				this._section.becomeNewOwner()		
+		}
+		
+
+		
         };
 
         window.onbeforeunload = () => {
@@ -57,6 +122,7 @@ export default class KurentoConfig {
                 console.log(this.channel);
             }
             else {
+		
                 this.channel.connect(CurrentRoom);
                 console.log(this.channel);
                 console.log(CurrentRoom);
@@ -192,6 +258,14 @@ export default class KurentoConfig {
         this.sendMessage({
             id: 'leaveRoom'
         });
+
+        if (this.roomOwner === true) {
+            for (let key in this.participants)
+                if (key !== this.name) {
+                    this._section.setNewRoomOwner(key);
+                    break;
+                }
+        }
 
         for (let key in this.participants) {
             this.participants[key].dispose();
