@@ -25,8 +25,8 @@ export default class Header extends Component {
                            onClick={this.props.onLogout}>Logout</a>
                     </nav>
                 </div>
-                <div className="mdl-layout__tab-bar mdl-js-ripple-effect">
-                    {this.props.roomIDs.map((element) => <Tab id={element} key={uniqueId()}/>)}
+                <div className="mdl-layout__header-row">
+                    <span className="mdl-layout-title collabo-room">{this.props.roomIDs.map((element) => <Tab id={element} key={uniqueId()}/>)}</span>
                 </div>
             </header>
         )

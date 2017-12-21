@@ -5,6 +5,7 @@ iframe {
 video {
     padding: 10px;
     width: 240px;
+    border-radius: 50%;
 }
 
 #video {
@@ -13,11 +14,17 @@ video {
     height: 90%;
 }
 
-.full-screen {
+/*.full-screen {
     height: 100%;
+}*/
+
+.participantsVideos {
+    align-content: center;
 }
 
 .participantsVideos video {
+    align-content: center;
+    width: 100%;
     float: right;
 }
 
@@ -28,4 +35,86 @@ video {
 
 .mdl-layout__drawer.is-visible {
     left: 0;
+}
+
+.mdl-layout__header {
+    background-image: url('https://puu.sh/yL3U6/6297a27c1a.png');
+    background-color: #005a42;
+}
+
+.collabo-room {
+    width: 100%;
+}
+
+.full-screen {
+    width: 100%;
+}
+
+.collabo-video{
+    border-radius: 25px;
+    background-color: #005a42;
+}
+
+.contol-panel{
+    border-radius: 25px;
+    background-color: #005a42;
+}
+
+.mdl-button--primary.mdl-button--primary{
+    color: #fff;
+}
+
+.mdl-data-table{
+    background-color: #005a42;
+    border: 0px;
+    border-radius: 25px;
+}
+
+.fadeIn{
+    animation-name: fadeIn;
+    -webkit-animation-name: fadeIn; 
+
+    animation-duration: 1.5s;   
+    -webkit-animation-duration: 1.5s;
+
+    animation-timing-function: ease-in-out; 
+    -webkit-animation-timing-function: ease-in-out;     
+
+    visibility: visible !important; 
+}
+
+@keyframes fadeIn {
+    0% {
+        transform: scale(0);
+        opacity: 0.0;       
+    }
+    60% {
+        transform: scale(1.1);  
+    }
+    80% {
+        transform: scale(0.9);
+        opacity: 1; 
+    }   
+    100% {
+        transform: scale(1);
+        opacity: 1; 
+    }       
+}
+
+@-webkit-keyframes fadeIn {
+    0% {
+        -webkit-transform: scale(0);
+        opacity: 0.0;       
+    }
+    60% {
+        -webkit-transform: scale(1.1);
+    }
+    80% {
+        -webkit-transform: scale(0.9);
+        opacity: 1; 
+    }   
+    100% {
+        -webkit-transform: scale(1);
+        opacity: 1; 
+    }       
 }

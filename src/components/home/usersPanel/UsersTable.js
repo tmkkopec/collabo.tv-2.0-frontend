@@ -116,8 +116,9 @@ export default class UsersTable extends Component {
                 <UsersButtons title={'Kick'} handleClick={this.kickSelectedUsers}/>
                 <UsersButtons title={'Enable'} handleClick={this.enableSelectedUsers}/>
                 <UsersButtons title={'Disable'} handleClick={this.disableSelectedUsers}/>
-                <UsersButtons title={'Owner'} handleClick={this.transferOwner}/>
+		 <UsersButtons title={'Owner'} handleClick={this.transferOwner}/>
                 <table className="mdl-data-table mdl-shadow--2dp">
+
                     <thead>
                     <tr>
                         <th>
