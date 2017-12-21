@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import MdlGrid from '../../mdl/MdlGrid';
+import MdlCell from '../../mdl/MdlCell';
 import Video from './Video';
 import VideoOptions from './VideoOptions';
 
@@ -8,7 +9,7 @@ const uniqueId = require('lodash/uniqueId');
 
 function Wrapper(props) {
     return (
-        <MdlGrid>
+        <MdlCell cellWidth={4}>
             <Video videoId={props.videoId}
                    src={props.src}
                    isRemoteVideo={props.isRemoteVideo}
@@ -17,7 +18,7 @@ function Wrapper(props) {
             <VideoOptions toggleVideo={() => props.toggleVideo(props.videoId, props.isRemoteVideo)}
                           toggleAudio={() => props.toggleAudio(props.videoId, props.isRemoteVideo)}
             />
-        </MdlGrid>
+        </MdlCell>
     )
 }
 
@@ -25,6 +26,7 @@ export default class VideoController extends Component {
     render() {
         return (
             <div className={'participantsVideos'}>
+            <MdlGrid>
                 <Wrapper videoId={this.props.localUsername}
                          toggleVideo={this.props.toggleVideo}
                          toggleAudio={this.props.toggleAudio}
@@ -39,6 +41,7 @@ export default class VideoController extends Component {
                              toggleAudio={this.props.toggleAudio}
                     />
                 )}
+                </MdlGrid>
             </div>
         )
     }

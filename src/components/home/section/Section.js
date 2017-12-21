@@ -303,47 +303,57 @@ class Section extends Component {
             <section className="mdl-layout__tab-panel is-active" id={'scroll-tab-' + this.props.id}>
                 <div className="page-content">
                     <MdlGrid className={'full-screen'}>
-                        <MdlCell cellWidth={7}>
+                        <MdlCell cellWidth={5}>
+                        <div className="contol-panel mdl-shadow--2dp">
+                        {this.state.owner === true ?
+                            <UserTable remoteUsers={Object.keys(this.state.remoteVideos)}  channel={this.state.channel} stopBeOwner={this.stopBeOwner} /> :
+                           <p>
+                <button className="mdl-button mdl-js-button mdl-button--primary" id="PlayButton" onClick={(e) => this.handlePlay(e)}>
+                     PLAY
+                 </button>
+
+                <button className="mdl-button mdl-js-button mdl-button--primary" id="PauseButton" onClick={(e) => this.handlePause(e)}>
+                     Pause
+                 </button>
+                <button className="mdl-button mdl-js-button mdl-button--primary" onClick={(e) => this.handleMute(e)}>
+                     Mute
+                 </button>
+
+            
+                
+                <input type="number" max="100" min="0" onChange={(e) => this.scrollVideo(e) } />
+            </p>
+            
+                        }
+                            
+                            </div>
+                        </MdlCell>
+                        <MdlCell cellWidth={6}>
+                            <MdlGrid>
+                            <MdlCell cellWidth={12}>
+                            <div className="collabo-video fadeIn">
                             <YouTube
                                 videoId={this.state.activeVideo}
                                 opts={opts}
                                 onReady={this._onReady}
                             />
+                            </div>
+                            </MdlCell>
+                            <MdlCell cellWidth={12}>
+                                <div className="video-bar">
+                                    <div className="mdl-layout__spacer"/>
+                                </div>
+                            </MdlCell>
+				            </MdlGrid>
                         </MdlCell>
-                        <MdlCell cellWidth={5}>
-                            
-				<button onClick={(e) => this.handlechuj(e)}>
-	    			 debbug
-	   			 </button>
-               			<VideoController
+                    </MdlGrid>
+                    <MdlGrid>
+                        <VideoController
                                 localUsername={this.props.webrtc.name}
                                 remoteVideos={this.state.remoteVideos}
                                 toggleAudio={this.props.webrtc.toggleAudio}
                                 toggleVideo={this.props.webrtc.toggleVideo}
                             />
-                        </MdlCell>
-                    </MdlGrid>
-                    <MdlGrid>
-                        {this.state.owner === true ?
-                            <UserTable remoteUsers={Object.keys(this.state.remoteVideos)}  channel={this.state.channel} stopBeOwner={this.stopBeOwner} /> :
-                           <p>
-				<button id="PlayButton" onClick={(e) => this.handlePlay(e)}>
-	    			 PLAY
-	   			 </button>
-
-				<button id="PauseButton" onClick={(e) => this.handlePause(e)}>
-	    			 Pause
-	   			 </button>
-				<button onClick={(e) => this.handleMute(e)}>
-	    			 Mute
-	   			 </button>
-
-			
-				
-				<input type="number" max="100" min="0" onChange={(e) => this.scrollVideo(e) } />
-			</p>
-			
-                        }
                     </MdlGrid>
                 </div>
             </section>
