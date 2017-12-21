@@ -10,12 +10,11 @@ export default class HomePage extends Component {
 
     constructor(props) {
         super(props);
+        this.onLogout = this.onLogout.bind(this);
 
         this.roomIDs = [Cookie.get('roomId')];
         this.name = Cookie.get('nickname');
-        this.webrtc = new WebRTCConfig(this.roomIDs[0], this.name);
-
-        this.onLogout = this.onLogout.bind(this);
+        this.webrtc = new WebRTCConfig(this.roomIDs[0], this.name, this.onLogout);
     }
 
     onLogout() {
@@ -32,7 +31,7 @@ export default class HomePage extends Component {
             <div className="mdl-layout mdl-js-layout mdl-layout--fixed-tabs mdl-layout--fixed-header">
                 <Header onLogout={this.onLogout} roomIDs={this.roomIDs}/>
                 <Drawer/>
-                <SectionsController sectionIDs={this.roomIDs} webrtc={this.webrtc}/>
+                <SectionsController sectionIDs={this.roomIDs} webrtc={this.webrtc} onLogout={this.onLogout}/>
             </div>
         )
     }
