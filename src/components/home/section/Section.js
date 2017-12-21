@@ -5,15 +5,16 @@ import MdlCell from '../../mdl/MdlCell';
 import VideoController from '../video/VideoController';
 import UserTable from '../usersPanel/UsersTable';
 import YouTube from 'react-youtube';
+import UsersButtons from "../usersPanel/UsersButtons";
 
 
 class Section extends Component {
     constructor(props) {
         super(props);
-	
+
         this.player = undefined;
         this.interval = undefined;
-	
+        this.ownerName = undefined;
         this.state = {
             remoteVideos: {},
             activeVideo: 'VZzFEHqSddU',
@@ -21,104 +22,147 @@ class Section extends Component {
             name: undefined,
             room: undefined,
             owner: undefined,
-	    		
+            creator: undefined,
+            socket: undefined,
+
         };
         Section.instance = this;
-	
 
         this._onReady = this._onReady.bind(this);
         this.changeVideo = this.changeVideo.bind(this);
         this.sendCurrentStatus = this.sendCurrentStatus.bind(this);
         this.startSynchronize = this.startSynchronize.bind(this);
-	 this.stopBeOwner = this.stopBeOwner.bind(this);
- 	this.changOwnerName = this.changOwnerName.bind(this);
-	this.becomeNewOwner = this.becomeNewOwner.bind(this);
+        this.stopBeOwner = this.stopBeOwner.bind(this);
+        this.changOwnerName = this.changOwnerName.bind(this);
+        this.becomeNewOwner = this.becomeNewOwner.bind(this);
         //this.updateStatus = this.updateStatus.bind(this);
         this.updateVideoTime = this.updateVideoTime.bind(this);
         this.updateVideoState = this.updateVideoState.bind(this);
         this.updateVideo = this.updateVideo.bind(this);
-        this.updateOwner = this.updateOwner.bind(this);
+        // this.updateOwner = this.updateOwner.bind(this);
+        this.setOwnerName = this.setOwnerName.bind(this);
+        this.scrollVideo = this.scrollVideo.bind(this);
+        this.createNewDatachannel = this.createNewDatachannel.bind(this);
+        this.leaveDataChannel = this.leaveDataChannel.bind(this);
+    }
+
+    setOwnerName(name) {
+        this.ownerName = name;
     }
 
     changeVideo(video) {
-        this.state.channel.send({'video' : video});
+        this.state.channel.send({'video': video});
         this.setState({activeVideo: video});
     }
 
     startSynchronize() {
         if (this.state.owner === true) {
-		
+
             this.interval = setInterval(this.sendCurrentStatus, 700);
         }
     }
-	
-	changOwnerName(msg){
-		if(msg.name !== this.state.room)
-		this.state.room=msg.name;
-	}
 
-	stopBeOwner(newOwner){
- 		this.setState({owner: false});
-		clearInterval(this.interval);
-		this.state.room=newOwner;
-		//console.log(newOwner + "@!@!@!@!");
-	}
+    changOwnerName(msg) {
+        if (msg.name !== this.state.room)
+            this.state.room = msg.name;
+    }
 
-	becomeNewOwner(){
-		this.setState({owner: true});
-		this.state.channel.send({'video' : this.state.activeVideo});
-		this.startSynchronize();
-	}
-
-	controlFromRemote(msg) {
-        	if(msg.do == "pause") this.player.pauseVideo();
-		else if(msg.do == "play") this.player.playVideo();
-		else if(msg.do == "scroll") {
-			this.player.seekTo(msg.time);
-		}		
-	
-	/*else if(msg.do == "getVideo"){
-			 console.log("4###" );
-			this.state.channel.channels[msg.user].send('video': 'm6J5fkzbKzE');	
-		}*/
-
-   	 }
+    stopBeOwner(newOwner) {
+        console.log(this.interval);
+        clearInterval(this.interval);
+        this.setOwnerName(newOwner);
+        const message = {
+            id: 'newOwner',
+            room: this.state.room,
+            owner: newOwner,
+            todo: "setOwners"
+        };
 
 
-	changeAllow(msg) {
-        	if(msg.perm == true) {
-		//console.log("wlacz przyciski");
-		document.getElementById("PlayButton").disabled = false;
-		document.getElementById("PauseButton").disabled = false;
-		}
-		else {
-		document.getElementById("PlayButton").disabled = true;
-		document.getElementById("PauseButton").disabled = true;
-		//console.log("wylacz przyciski");
-		}		
+        this.state.socket.emit('message', message);
+        this.setState({owner: false});
 
-   	 }
+        console.log("nowy owner" + newOwner);
+    }
 
-	 sendVideo(msg) {
+    becomeNewOwner() {
+        this.setState({owner: true});
+        this.state.channel.send({'video': this.state.activeVideo});
+        this.startSynchronize();
+    }
 
-         
-	this.state.channel.channels[msg.user].send({'video' : this.state.activeVideo});
+	createNewDatachannel(){
 
-	const message = {
-          		  "changeOwner": true,
-          		  "name": this.state.room
-         		 
-      		  };
-	this.state.channel.channels[msg.user].send(message);
-    }	
+
+	this.state.channel.open(this.state.room);
+
+	/* !!!!!!!!!!!!!
+		const message = {
+		    id: 'createNewChannel',
+		    room: this.state.room,
+		    ownerName: this.state.name
+		};
+
+			this.state.socket.emit('message', message);
+
+
+        */
+
+    }
+
+    leaveDataChannel() {
+        console.log("WYCHODZIMY");
+        this.state.channel.leave();
+    }
+
+    controlFromRemote(msg) {
+        if (msg.do == "pause") this.player.pauseVideo();
+        else if (msg.do == "play") this.player.playVideo();
+        else if (msg.do == "scroll") {
+            this.player.seekTo(msg.time);
+        }
+
+
+    }
+
+
+    changeAllow(msg) {
+        if (msg.perm == true) {
+
+            document.getElementById("PlayButton").disabled = false;
+            document.getElementById("PauseButton").disabled = false;
+        }
+        else {
+            document.getElementById("PlayButton").disabled = true;
+            document.getElementById("PauseButton").disabled = true;
+
+        }
+
+    }
+
+    sendVideo(msg) {
+
+
+        this.state.channel.channels[msg.user].send({'video': this.state.activeVideo});
+        /*
+            const message = {
+                            "changeOwner": true,
+                            "name": this.state.room
+
+                        };
+            this.channel.channels[msg.user].send(message);
+        */
+    }
 
     sendCurrentStatus() {
-        const state = {
-            'time': this.player.getCurrentTime(),
-            'state': this.player.getPlayerState()
-        };
-	
-        this.state.channel.send(state);
+        if (this.state.owner) {
+            const state = {
+                'time': this.player.getCurrentTime(),
+                'state': this.player.getPlayerState()
+            };
+
+            this.state.channel.send(state);
+        }
     }
 
     updateVideoTime(newTime) {
@@ -133,27 +177,23 @@ class Section extends Component {
 
     updateVideoState(newState) {
         const state = this.player.getPlayerState();
-        if (state !== newState && state != 3 ) {
+        if (state !== newState && state != 3) {
             console.log(newState + " " + state);
-            if ( newState === 1 ) this.player.playVideo();
-            if ( newState === 2 ) this.player.pauseVideo();
+            if (newState === 1) this.player.playVideo();
+            if (newState === 2) this.player.pauseVideo();
         }
     }
 
-       updateVideo(newVideo) {
-	console.log(newVideo);
-	if(this.state.activeVideo !== newVideo){
-        		this.setState({activeVideo: newVideo});
-		}
-	}
-
-    updateOwner(newOwner) {
-        if (this.state.name === newOwner) {
-            // this.setState({owner: true}, () => this.startSynchronize());
+    updateVideo(newVideo) {
+        console.log(newVideo);
+        if (this.state.activeVideo !== newVideo) {
+            this.setState({activeVideo: newVideo});
         }
     }
+
+    
 	updateStatus(status) {
-	//console.log("KWAS");
+
         const time = this.player.getCurrentTime();
         if (time > status.time + 1 || time < status.time - 1) {
             if (this.player.getPlayerState() !== 3) {
@@ -163,10 +203,10 @@ class Section extends Component {
         }
 
         const state = this.player.getPlayerState();
-        if (state !== status.state && state != 3 ) {
+        if (state !== status.state && state != 3) {
             console.log(status.state + " " + state);
-            if ( status.state === 1 ) this.player.playVideo();
-            if ( status.state === 2 ) this.player.pauseVideo();
+            if (status.state === 1) this.player.playVideo();
+            if (status.state === 2) this.player.pauseVideo();
         }
 
         if (status.video) {
@@ -200,86 +240,79 @@ class Section extends Component {
             }
         });
     }
-	*/
+    */
     setNewRoomOwner(newOwnerName) {
         this.state.channel.send({'owner': newOwnerName});
     }
-	handlePlay() {
-	   	
-		  const remoteMesage = {
-          		  "remoteControl": "true",
-			  "do": "play"
-          		 };
- 		
-		this.state.channel.channels[this.state.room].send(remoteMesage);
-		
-		
-  	}	
 
-	handlePause() {
-	   
-		  const remoteMesage = {
-          		  "remoteControl": "true",
-			  "do": "pause"
-          		 };
- 		
-		this.state.channel.channels[this.state.room].send(remoteMesage);
-		
-  	}	
-	handleMute() {
-		//need toggle button
-		if(this.player.isMuted()) {
-			 this.player.unMute()
-		}
-		else {
-			this.player.mute()
-     		}
-	}
-	
+    handlePlay() {
 
-	handlechuj(){
-		/*
-		  const siup = {
-          		  "cos": "kot",
-          		  "ktos": this.state.room
-         		 
-      		  };
- 		
-		var user="ala";
-		this.state.channel.channels[user].send(siup);
-		*/
+        const remoteMesage = {
+            "remoteControl": "true",
+            "do": "play"
+        };
 
-		console.log("2###" + this.state.name + this.state.room + this.state.channel.channels );
+        this.state.channel.channels[this.ownerName].send(remoteMesage);
+
+
+    }
+
+    handlePause() {
+
+        const remoteMesage = {
+            "remoteControl": "true",
+            "do": "pause"
+        };
+
+        this.state.channel.channels[this.ownerName].send(remoteMesage);
+
+    }
+
+    handleMute() {
+        //need toggle button
+        if (this.player.isMuted()) {
+            this.player.unMute()
+        }
+        else {
+            this.player.mute()
+        }
+    }
+
+
+	handledebbug(){
+
+
+
 		console.log(this.state.channel.channels);
 		/*
 		if(this.state.owner) this.setState({owner: false});
 		else this.setState({owner: true});
-		*/
+		*/ 
+		if(!this.state.owner){
+		this.scrollVideo(50);
+		}
 
-
-		console.log("CCCCCCCC  " + this.state.room);
+		console.log("owner name  " + this.ownerName);
 	}
-	
+
 	 scrollVideo(event) {
    	 	var time = this.player.getDuration() * (event / 100) ;
-		//console.log(time + "%%%%%%%%%%%%%%%%%%%%%" + event);
-		//console.log( event);
+
    	 	 const remoteMesage = {
           		  "remoteControl": "true",
 			  "do": "scroll",
 			  "time" : time	
           		 };
-		this.state.channel.channels[this.state.room].send(remoteMesage);
+		this.state.channel.channels[this.ownerName].send(remoteMesage);
 	}
 
 
     _onReady(event) {
         this.player = event.target;
         this.player.playVideo();
-	
+
     }
 
-	
 
     componentDidMount() {
         this.props.webrtc.section = this;
@@ -346,14 +379,30 @@ class Section extends Component {
                             </MdlCell>
 				            </MdlGrid>
                         </MdlCell>
-                    </MdlGrid>
-                    <MdlGrid>
-                        <VideoController
+
+                        <MdlCell cellWidth={5}>
+                            <VideoController
+
                                 localUsername={this.props.webrtc.name}
                                 remoteVideos={this.state.remoteVideos}
                                 toggleAudio={this.props.webrtc.toggleAudio}
                                 toggleVideo={this.props.webrtc.toggleVideo}
                             />
+                        </MdlCell>
+                    </MdlGrid>
+                    <MdlGrid>
+                        {this.state.owner === true ?
+                            <UserTable remoteUsers={Object.keys(this.state.remoteVideos)}
+                                       channel={this.state.channel}
+                                       stopBeOwner={this.stopBeOwner}
+                            /> :
+                            <MdlCell cellWidth={12}>
+                                <UsersButtons title={'Play'} handleClick={this.handlePlay}/>
+                                <UsersButtons title={'Pause'} handleClick={this.handlePause}/>
+                                <UsersButtons title={'Mute'} handleClick={this.handleMute}/>
+                                <input type="number" max="100" min="0" onChange={(e) => this.scrollVideo(e)}/>
+                            </MdlCell>
+                        }
                     </MdlGrid>
                 </div>
             </section>
