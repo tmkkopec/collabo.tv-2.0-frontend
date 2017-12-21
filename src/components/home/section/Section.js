@@ -35,15 +35,16 @@ class Section extends Component {
         this.stopBeOwner = this.stopBeOwner.bind(this);
         this.changOwnerName = this.changOwnerName.bind(this);
         this.becomeNewOwner = this.becomeNewOwner.bind(this);
-        //this.updateStatus = this.updateStatus.bind(this);
         this.updateVideoTime = this.updateVideoTime.bind(this);
         this.updateVideoState = this.updateVideoState.bind(this);
         this.updateVideo = this.updateVideo.bind(this);
-        // this.updateOwner = this.updateOwner.bind(this);
         this.setOwnerName = this.setOwnerName.bind(this);
         this.scrollVideo = this.scrollVideo.bind(this);
         this.createNewDatachannel = this.createNewDatachannel.bind(this);
         this.leaveDataChannel = this.leaveDataChannel.bind(this);
+        this.handleMute = this.handleMute.bind(this);
+        this.handlePause = this.handlePause.bind(this);
+        this.handlePlay = this.handlePlay.bind(this);
     }
 
     setOwnerName(name) {

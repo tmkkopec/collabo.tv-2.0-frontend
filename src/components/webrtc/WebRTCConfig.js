@@ -334,7 +334,9 @@ export default class KurentoConfig {
             id: 'leaveRoom'
         });
         if (this.roomOwner) {
-            //wyloguj wszystkich
+            for (let key in this.participants) {
+                this.channel.channels[key].send({'kick': 'lecisz'})
+            }
         }
         else if (this.roomCreator) {
             //stowrz nowy kanal z ownera
