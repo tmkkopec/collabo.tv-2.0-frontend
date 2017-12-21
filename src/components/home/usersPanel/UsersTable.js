@@ -78,12 +78,12 @@ export default class UsersTable extends Component {
 	
 	for (var user of this.selectedUsers) {
 	  console.log(user);
-	//give him owner bitch.	
 	
-	//1stop be owner
+	
+	
 	this.props.stopBeOwner(user);
 	// send new owner name
-	
+	/*
 	const msg = {
           		  "changeOwner": true,
           		  "name": user
@@ -91,7 +91,7 @@ export default class UsersTable extends Component {
       		  };
 	this.props.channel.send(msg) //nowy message i obsługa
 	// send info to new owner
-	
+	*/
 	
 	this.props.channel.channels[user].send({"newOwner" : true }) //stan sie ownerem
 	//new owner send own video and start be owner

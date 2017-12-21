@@ -13,7 +13,7 @@ class Section extends Component {
 	
         this.player = undefined;
         this.interval = undefined;
-	
+	this.ownerName = undefined;
         this.state = {
             remoteVideos: {},
             activeVideo: 'VZzFEHqSddU',
@@ -21,10 +21,11 @@ class Section extends Component {
             name: undefined,
             room: undefined,
             owner: undefined,
+		creator: undefined,
+		socket: undefined,
 	    		
         };
-        Section.instance = this;
-	
+        Section.instance = this;	
 
         this._onReady = this._onReady.bind(this);
         this.changeVideo = this.changeVideo.bind(this);
@@ -37,7 +38,15 @@ class Section extends Component {
         this.updateVideoTime = this.updateVideoTime.bind(this);
         this.updateVideoState = this.updateVideoState.bind(this);
         this.updateVideo = this.updateVideo.bind(this);
-        this.updateOwner = this.updateOwner.bind(this);
+       // this.updateOwner = this.updateOwner.bind(this);
+	this.setOwnerName = this.setOwnerName.bind(this);
+	this.scrollVideo = this.scrollVideo.bind(this); 
+	this.createNewDatachannel = this.createNewDatachannel.bind(this);
+	this.leaveDataChannel = this.leaveDataChannel.bind(this);
+    }
+
+    setOwnerName(name){
+	this.ownerName=name;
     }
 
     changeVideo(video) {
@@ -58,16 +67,52 @@ class Section extends Component {
 	}
 
 	stopBeOwner(newOwner){
- 		this.setState({owner: false});
+		console.log(this.interval);
 		clearInterval(this.interval);
-		this.state.room=newOwner;
-		//console.log(newOwner + "@!@!@!@!");
+		this.setOwnerName(newOwner);
+		const message = {
+			    id: 'newOwner',
+			    room: this.state.room,
+			    owner: newOwner,
+			    todo: "setOwners"	
+			};
+			
+			
+		this.state.socket.emit('message', message);
+ 		this.setState({owner: false});
+		
+		console.log("nowy owner" + newOwner);
 	}
 
 	becomeNewOwner(){
 		this.setState({owner: true});
 		this.state.channel.send({'video' : this.state.activeVideo});
 		this.startSynchronize();
+	}
+
+	createNewDatachannel(){
+		console.log("czas stworzyc nowy kanał ichhhhhhhha");
+	
+	this.state.channel.open(this.state.room);
+		
+	/* !!!!!!!!!!!!!
+		const message = {
+		    id: 'createNewChannel',
+		    room: this.state.room,
+		    ownerName: this.state.name	
+		};
+	
+			this.state.socket.emit('message', message);
+			
+		console.log("poszlo");
+
+	*/
+		
+	}	
+
+	leaveDataChannel(){
+		console.log("WYCHODZIMY");
+		this.state.channel.leave();
 	}
 
 	controlFromRemote(msg) {
@@ -77,24 +122,20 @@ class Section extends Component {
 			this.player.seekTo(msg.time);
 		}		
 	
-	/*else if(msg.do == "getVideo"){
-			 console.log("4###" );
-			this.state.channel.channels[msg.user].send('video': 'm6J5fkzbKzE');	
-		}*/
 
    	 }
 
 
 	changeAllow(msg) {
         	if(msg.perm == true) {
-		//console.log("wlacz przyciski");
+		
 		document.getElementById("PlayButton").disabled = false;
 		document.getElementById("PauseButton").disabled = false;
 		}
 		else {
 		document.getElementById("PlayButton").disabled = true;
 		document.getElementById("PauseButton").disabled = true;
-		//console.log("wylacz przyciski");
+		
 		}		
 
    	 }
@@ -103,22 +144,25 @@ class Section extends Component {
 
          
 	this.state.channel.channels[msg.user].send({'video' : this.state.activeVideo});
-
+/*
 	const message = {
           		  "changeOwner": true,
           		  "name": this.state.room
          		 
       		  };
-	this.state.channel.channels[msg.user].send(message);
+	this.channel.channels[msg.user].send(message);
+*/
     }	
 
     sendCurrentStatus() {
+	if(this.state.owner) {
         const state = {
             'time': this.player.getCurrentTime(),
             'state': this.player.getPlayerState()
         };
 	
         this.state.channel.send(state);
+	}
     }
 
     updateVideoTime(newTime) {
@@ -147,11 +191,7 @@ class Section extends Component {
 		}
 	}
 
-    updateOwner(newOwner) {
-        if (this.state.name === newOwner) {
-            // this.setState({owner: true}, () => this.startSynchronize());
-        }
-    }
+    
 	updateStatus(status) {
 	//console.log("KWAS");
         const time = this.player.getCurrentTime();
@@ -211,7 +251,7 @@ class Section extends Component {
 			  "do": "play"
           		 };
  		
-		this.state.channel.channels[this.state.room].send(remoteMesage);
+		this.state.channel.channels[this.ownerName].send(remoteMesage);
 		
 		
   	}	
@@ -223,7 +263,7 @@ class Section extends Component {
 			  "do": "pause"
           		 };
  		
-		this.state.channel.channels[this.state.room].send(remoteMesage);
+		this.state.channel.channels[this.ownerName].send(remoteMesage);
 		
   	}	
 	handleMute() {
@@ -254,10 +294,12 @@ class Section extends Component {
 		/*
 		if(this.state.owner) this.setState({owner: false});
 		else this.setState({owner: true});
-		*/
+		*/ 
+		if(!this.state.owner){
+		this.scrollVideo(50);
+		}
 
-
-		console.log("CCCCCCCC  " + this.state.room);
+		console.log("CCCCCCCC  " + this.ownerName);
 	}
 	
 	 scrollVideo(event) {
@@ -269,14 +311,21 @@ class Section extends Component {
 			  "do": "scroll",
 			  "time" : time	
           		 };
-		this.state.channel.channels[this.state.room].send(remoteMesage);
+		this.state.channel.channels[this.ownerName].send(remoteMesage);
 	}
 
 
     _onReady(event) {
         this.player = event.target;
         this.player.playVideo();
+	/*
+	const message = {
+            id: 'askWhoIsOwner',
+            room: this.state.room,
+	    todo: ""	
+        };
 	
+	this.state.socket.emit('message', message);*/	
     }
 
 	

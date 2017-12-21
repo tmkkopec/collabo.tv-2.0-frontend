@@ -9,10 +9,14 @@ export default class KurentoConfig {
         this.participants = {};
         this.name = name;
         this.room = room;
-	this.ownerName = room;
+	this.ownerName ="";
         this.roomOwner = false;
+	var tmp;
+	var tmp2=this._section;
+	this.roomCreator = false;
         this.channel = new window.DataChannel();
 	this.channel.userid = this.name;
+	//this.channel.autoCloseEntireSession = true;
         let onMessageCallbacks = {};
         let socket = this.ws;
         let CurrentRoom = this.room;
@@ -33,31 +37,45 @@ export default class KurentoConfig {
             };
         };
 	//jakos trzeba zmienic bo nie dzialalo w tej funkcji
-	var dupa=this.channel;
-	var dupa2=this.room;
-	var dupa3=this.name;
+	
         this.channel.onopen = () => {
-            if( this.roomOwner ) this._section.startSynchronize()
-		
+		console.log("ONOPEN");
+            if( this.roomOwner ) {
+			this._section.startSynchronize()
+			//this.roomOwner=false;
+		}		
 		else{
 		console.log("zapytaj o film");
 		
 		setTimeout(function(){
-			console.log(dupa3);
-
-			 const msg = {
-          		 "getVideo" : true,
-			"user" : dupa3 
-          		 };
-			dupa.send(msg)
-			
-			
+			const message = {
+			    id: 'askWhoIsOwner',
+			    room: CurrentRoom,
+			    todo: "askFilmUrlAndSetOwner"	
+			};
+			console.log(socket);
+			socket.emit('message', message);
 			
 		}, 10);
 		//
 		}
         };
-       
+/*
+        this.channel.onleave = function (userid) {
+	    console.log(userid +"   wyszedl");
+	};
+	*/
+	/*
+	
+	this.channel.onclose = () => {
+	console.log("WYJEBALO NAM CHANELA");	
+	console.log(tmp);
+		if(tmp){
+			this._section.createNewDatachannel();
+			
+			}		
+	}
+	*/
 	
         this.channel.onmessage = msg => {
             
@@ -102,7 +120,19 @@ export default class KurentoConfig {
 				this._section.becomeNewOwner()		
 		}
 		
-
+		else if(msg.creatorLeft){
+				this._section.leaveDataChannel();	
+		}
+		
+		else if(msg.creatorLeft){
+				this._section.leaveDataChannel();	
+		}
+		
+		else if(msg.createNewDatachannel){
+				this.roomCreator = true;
+				this._section.createNewDatachannel();	
+		}
+			
 		
         };
 
@@ -117,7 +147,9 @@ export default class KurentoConfig {
         this.ws.on('CreatedRoom', Owner => {
             this.roomOwner = Owner;
             if (this.roomOwner) {
-                this.channel.userid = CurrentRoom;
+		this.roomCreator=true;
+		this.ownerName=this.name;
+               // this.channel.userid = CurrentRoom;
                 this.channel.open(CurrentRoom);
                 console.log(this.channel);
             }
@@ -132,7 +164,9 @@ export default class KurentoConfig {
                 channel: this.channel,
                 name: this.name,
                 room: this.room,
-                owner: this.roomOwner
+                owner: this.roomOwner,
+		socket: this.ws,
+		creator: this.roomCreator
             })
         });
 
@@ -151,6 +185,49 @@ export default class KurentoConfig {
             console.info('Received message: ' + parsedMessage.id);
 
             switch (parsedMessage.id) {
+		case 'owner':
+			console.log("############################################################################");
+			console.log(parsedMessage.owner);
+			console.log(parsedMessage.todo);
+			if(parsedMessage.todo == 'askFilmUrlAndSetOwner'){
+			this.ownerName=parsedMessage.owner;
+			this._section.setOwnerName(parsedMessage.owner);			
+
+			const msg = {
+          		 "getVideo" : true,
+			"user" : this.name
+          		 };
+			this.channel.channels[parsedMessage.owner].send(msg)
+
+			}
+
+			if(parsedMessage.todo == 'setOwners'){
+			console.log("ZZZZZZZ" + parsedMessage.owner);
+			this.ownerName=parsedMessage.owner;
+			console.log(this.name + " " +parsedMessage.owner)
+			 if(this.name == parsedMessage.owner){
+		 		this.roomOwner=true;
+				tmp=true;	
+			}
+			 else this.roomOwner = false;
+			console.log(this.roomOwner);
+			this._section.setOwnerName(parsedMessage.owner);
+
+			}
+		    break;
+
+		
+		case 'connectToNewChannel':
+			console.log("HUHUHUHU");
+			
+			
+			 this.channel.connect(CurrentRoom);
+			console.log("CZY TERAZ JUZ DZIAŁA?");
+		
+			
+			
+			
+		    break;		
                 case 'existingParticipants':
                     this.onExistingParticipants(parsedMessage);
                     break;
@@ -214,6 +291,8 @@ export default class KurentoConfig {
         );
     }
 
+	
+
     onExistingParticipants(msg) {
         const constraints = {
             audio: true,
@@ -258,14 +337,25 @@ export default class KurentoConfig {
         this.sendMessage({
             id: 'leaveRoom'
         });
-
+	if(this.roomOwner) {
+		//wyloguj wszystkich
+	}
+	else if(this.roomCreator){
+		//stowrz nowy kanal z ownera
+		//this.channel.send({creatorLeft : true}); //creatorLeft
+		this.channel.channels[this.ownerName].send( { createNewDatachannel : true});
+		//this.channel.autoCloseEntireSession = true;
+		this.channel.leave();
+	}
+	/*  
+	
         if (this.roomOwner === true) {
             for (let key in this.participants)
                 if (key !== this.name) {
                     this._section.setNewRoomOwner(key);
                     break;
                 }
-        }
+        }*/
 
         for (let key in this.participants) {
             this.participants[key].dispose();
