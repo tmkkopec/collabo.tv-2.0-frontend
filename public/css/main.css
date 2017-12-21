@@ -18,6 +18,10 @@ video {
     height: 100%;
 }*/
 
+.mdl-layout__content{
+    background-image: url('https://puu.sh/yL5WV/68b6a4dd97.png');
+    background-position: right bottom;
+}
 .participantsVideos {
     align-content: center;
 }

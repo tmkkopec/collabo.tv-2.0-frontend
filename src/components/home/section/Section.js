@@ -390,20 +390,6 @@ class Section extends Component {
                             />
                         </MdlCell>
                     </MdlGrid>
-                    <MdlGrid>
-                        {this.state.owner === true ?
-                            <UserTable remoteUsers={Object.keys(this.state.remoteVideos)}
-                                       channel={this.state.channel}
-                                       stopBeOwner={this.stopBeOwner}
-                            /> :
-                            <MdlCell cellWidth={12}>
-                                <UsersButtons title={'Play'} handleClick={this.handlePlay}/>
-                                <UsersButtons title={'Pause'} handleClick={this.handlePause}/>
-                                <UsersButtons title={'Mute'} handleClick={this.handleMute}/>
-                                <input type="number" max="100" min="0" onChange={(e) => this.scrollVideo(e)}/>
-                            </MdlCell>
-                        }
-                    </MdlGrid>
                 </div>
             </section>
         )
