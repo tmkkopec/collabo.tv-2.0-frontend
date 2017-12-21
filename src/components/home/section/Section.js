@@ -321,7 +321,7 @@ class Section extends Component {
 
     render() {
         const opts = {
-            height: '450',
+            height: '350',
             width: '800',
             playerVars: {
                 autoplay: 1,
