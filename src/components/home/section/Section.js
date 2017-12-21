@@ -17,7 +17,7 @@ class Section extends Component {
         this.ownerName = undefined;
         this.state = {
             remoteVideos: {},
-            activeVideo: 'VZzFEHqSddU',
+            activeVideo: 'tZUcCRzwHtY',
             channel: undefined,
             name: undefined,
             room: undefined,
