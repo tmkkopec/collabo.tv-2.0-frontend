@@ -91,21 +91,20 @@ class Section extends Component {
         this.startSynchronize();
     }
 
-    createNewDatachannel() {
-        console.log("czas stworzyc nowy kanał ichhhhhhhha");
+	createNewDatachannel(){
 
-        this.state.channel.open(this.state.room);
 
-        /* !!!!!!!!!!!!!
-            const message = {
-                id: 'createNewChannel',
-                room: this.state.room,
-                ownerName: this.state.name
-            };
+	this.state.channel.open(this.state.room);
 
-                this.state.socket.emit('message', message);
+	/* !!!!!!!!!!!!!
+		const message = {
+		    id: 'createNewChannel',
+		    room: this.state.room,
+		    ownerName: this.state.name
+		};
 
-            console.log("poszlo");
+			this.state.socket.emit('message', message);
+
 
         */
 
@@ -192,9 +191,9 @@ class Section extends Component {
         }
     }
 
+    
+	updateStatus(status) {
 
-    updateStatus(status) {
-        //console.log("KWAS");
         const time = this.player.getCurrentTime();
         if (time > status.time + 1 || time < status.time - 1) {
             if (this.player.getPlayerState() !== 3) {
@@ -215,13 +214,13 @@ class Section extends Component {
         }
     }
 
-    /* need fix, double invoke
+	/* need fix, double invoke
     updateStatus(status) {
         Object.entries(status).forEach(obj => {
             const key = obj[0];
             const value = obj[1];
-    console.log("KWAS");
-    //console.log(status);
+	console.log("KWAS");
+	//console.log(status);
             switch (key) {
                 case 'time':
                     this.updateVideoTime(value);
@@ -280,55 +279,38 @@ class Section extends Component {
     }
 
 
-    handlechuj() {
-        /*
-          const siup = {
-                    "cos": "kot",
-                    "ktos": this.state.room
+	handledebbug(){
 
-                };
 
-        var user="ala";
-        this.state.channel.channels[user].send(siup);
-        */
 
-        console.log("2###" + this.state.name + this.state.room + this.state.channel.channels);
-        console.log(this.state.channel.channels);
-        /*
-        if(this.state.owner) this.setState({owner: false});
-        else this.setState({owner: true});
-        */
-        if (!this.state.owner) {
-            this.scrollVideo(50);
-        }
+		console.log(this.state.channel.channels);
+		/*
+		if(this.state.owner) this.setState({owner: false});
+		else this.setState({owner: true});
+		*/ 
+		if(!this.state.owner){
+		this.scrollVideo(50);
+		}
 
-        console.log("CCCCCCCC  " + this.ownerName);
-    }
+		console.log("owner name  " + this.ownerName);
+	}
 
-    scrollVideo(event) {
-        var time = this.player.getDuration() * (event / 100);
-        //console.log(time + "%%%%%%%%%%%%%%%%%%%%%" + event);
-        //console.log( event);
-        const remoteMesage = {
-            "remoteControl": "true",
-            "do": "scroll",
-            "time": time
-        };
-        this.state.channel.channels[this.ownerName].send(remoteMesage);
-    }
+	 scrollVideo(event) {
+   	 	var time = this.player.getDuration() * (event / 100) ;
+
+   	 	 const remoteMesage = {
+          		  "remoteControl": "true",
+			  "do": "scroll",
+			  "time" : time	
+          		 };
+		this.state.channel.channels[this.ownerName].send(remoteMesage);
+	}
 
 
     _onReady(event) {
         this.player = event.target;
         this.player.playVideo();
-        /*
-        const message = {
-                id: 'askWhoIsOwner',
-                room: this.state.room,
-            todo: ""
-            };
 
-        this.state.socket.emit('message', message);*/
     }
 
 
