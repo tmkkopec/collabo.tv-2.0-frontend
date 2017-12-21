@@ -91,7 +91,7 @@ class Section extends Component {
 	}
 
 	createNewDatachannel(){
-		console.log("czas stworzyc nowy kanał ichhhhhhhha");
+		
 	
 	this.state.channel.open(this.state.room);
 		
@@ -103,8 +103,7 @@ class Section extends Component {
 		};
 	
 			this.state.socket.emit('message', message);
-			
-		console.log("poszlo");
+		
 
 	*/
 		
@@ -193,7 +192,7 @@ class Section extends Component {
 
     
 	updateStatus(status) {
-	//console.log("KWAS");
+	
         const time = this.player.getCurrentTime();
         if (time > status.time + 1 || time < status.time - 1) {
             if (this.player.getPlayerState() !== 3) {
@@ -277,19 +276,10 @@ class Section extends Component {
 	}
 	
 
-	handlechuj(){
-		/*
-		  const siup = {
-          		  "cos": "kot",
-          		  "ktos": this.state.room
-         		 
-      		  };
- 		
-		var user="ala";
-		this.state.channel.channels[user].send(siup);
-		*/
+	handledebbug(){
+		
 
-		console.log("2###" + this.state.name + this.state.room + this.state.channel.channels );
+		
 		console.log(this.state.channel.channels);
 		/*
 		if(this.state.owner) this.setState({owner: false});
@@ -299,13 +289,12 @@ class Section extends Component {
 		this.scrollVideo(50);
 		}
 
-		console.log("CCCCCCCC  " + this.ownerName);
+		console.log("owner name  " + this.ownerName);
 	}
 	
 	 scrollVideo(event) {
    	 	var time = this.player.getDuration() * (event / 100) ;
-		//console.log(time + "%%%%%%%%%%%%%%%%%%%%%" + event);
-		//console.log( event);
+		
    	 	 const remoteMesage = {
           		  "remoteControl": "true",
 			  "do": "scroll",
@@ -318,14 +307,7 @@ class Section extends Component {
     _onReady(event) {
         this.player = event.target;
         this.player.playVideo();
-	/*
-	const message = {
-            id: 'askWhoIsOwner',
-            room: this.state.room,
-	    todo: ""	
-        };
 	
-	this.state.socket.emit('message', message);*/	
     }
 
 	
@@ -361,7 +343,7 @@ class Section extends Component {
                         </MdlCell>
                         <MdlCell cellWidth={5}>
                             
-				<button onClick={(e) => this.handlechuj(e)}>
+				<button onClick={(e) => this.handledebbug(e)}>
 	    			 debbug
 	   			 </button>
                			<VideoController
@@ -389,7 +371,7 @@ class Section extends Component {
 
 			
 				
-				<input type="number" max="100" min="0" onChange={(e) => this.scrollVideo(e) } />
+				
 			</p>
 			
                         }
