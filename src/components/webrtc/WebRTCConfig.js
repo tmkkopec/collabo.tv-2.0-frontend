@@ -43,7 +43,7 @@ export default class KurentoConfig {
             console.log("ONOPEN");
             if (this.roomOwner) {
                 this._section.startSynchronize()
-                //this.roomOwner=false;
+                
             }
             else {
                 console.log("zapytaj o film");
@@ -66,17 +66,7 @@ export default class KurentoConfig {
                 console.log(userid +"   left datachannel");
         };
            
-        /*
-
-        this.channel.onclose = () => {
-        console.log("WYJEBALO NAM CHANELA");
-        console.log(tmp);
-            if(tmp){
-                this._section.createNewDatachannel();
-
-                }
-        }
-        */
+       
 
         this.channel.onmessage = msg => {
 
@@ -210,16 +200,7 @@ export default class KurentoConfig {
                     }
                     break;
 
-	/*
-                case 'connectToNewChannel':
-                    console.log("HUHUHUHU");
-
-
-                    this.channel.connect(CurrentRoom);
-                    console.log("CZY TERAZ JUZ DZIAŁA?");
-
-
-                    break;*/
+	
                 case 'existingParticipants':
                     this.onExistingParticipants(parsedMessage);
                     break;
@@ -328,18 +309,17 @@ export default class KurentoConfig {
         this.sendMessage({
             id: 'leaveRoom'
         });
+
+
         if (this.roomOwner) {
-<<<<<<< HEAD
-          // this.props.channel.channels[user].send({'kick': 'true'})
+
 	for (let key in this.participants) {
             
-		 this.channel.channels[this.participants[key]].send({'kick': 'true'});
+		this.channel.channels[this.participants[key]].send({'kick': 'true'});
         }
-=======
-            for (let key in this.participants) {
-                this.channel.channels[key].send({'kick': 'lecisz'})
-            }
->>>>>>> ab6d1df6c2dcb9d6e853e0b22902cb68d2187350
+
+            
+
         }
         else if (this.roomCreator) {
             //send mesege to owner to open chanel again
@@ -348,15 +328,7 @@ export default class KurentoConfig {
             
             this.channel.leave();
         }
-        /*
-
-            if (this.roomOwner === true) {
-                for (let key in this.participants)
-                    if (key !== this.name) {
-                        this._section.setNewRoomOwner(key);
-                        break;
-                    }
-            }*/
+       
 
         for (let key in this.participants) {
             this.participants[key].dispose();

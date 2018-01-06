@@ -35,8 +35,6 @@ class Section extends Component {
         this.stopBeOwner = this.stopBeOwner.bind(this);
         this.changOwnerName = this.changOwnerName.bind(this);
         this.becomeNewOwner = this.becomeNewOwner.bind(this);
-        this.updateVideoTime = this.updateVideoTime.bind(this);
-        this.updateVideoState = this.updateVideoState.bind(this);
         this.updateVideo = this.updateVideo.bind(this);
         this.setOwnerName = this.setOwnerName.bind(this);
         this.scrollVideo = this.scrollVideo.bind(this);
@@ -92,27 +90,15 @@ class Section extends Component {
         this.startSynchronize();
     }
 
-	createNewDatachannel(){
+    createNewDatachannel(){
 
 
 	this.state.channel.open(this.state.room);
 
-	/* !!!!!!!!!!!!!
-		const message = {
-		    id: 'createNewChannel',
-		    room: this.state.room,
-		    ownerName: this.state.name
-		};
-
-			this.state.socket.emit('message', message);
-
-
-        */
-
     }
 
     leaveDataChannel() {
-        console.log("WYCHODZIMY");
+        
         this.state.channel.leave();
     }
 
@@ -159,24 +145,7 @@ class Section extends Component {
         }
     }
 
-    updateVideoTime(newTime) {
-        const time = this.player.getCurrentTime();
-        if (time > newTime + 1 || time < newTime - 1) {
-            if (this.player.getPlayerState() !== 3) {
-                this.player.seekTo(newTime);
-                console.log(newTime + " " + time);
-            }
-        }
-    }
-
-    updateVideoState(newState) {
-        const state = this.player.getPlayerState();
-        if (state !== newState && state != 3) {
-            console.log(newState + " " + state);
-            if (newState === 1) this.player.playVideo();
-            if (newState === 2) this.player.pauseVideo();
-        }
-    }
+   
 
     updateVideo(newVideo) {
         console.log(newVideo);
@@ -208,33 +177,7 @@ class Section extends Component {
         }
     }
 
-	/* need fix, double invoke
-    updateStatus(status) {
-        Object.entries(status).forEach(obj => {
-            const key = obj[0];
-            const value = obj[1];
-	console.log("KWAS");
-	//console.log(status);
-            switch (key) {
-                case 'time':
-                    this.updateVideoTime(value);
-                    break;
-                case 'state':
-                    this.updateVideoState(value);
-                    break;
-                case 'video':
-                    this.updateVideo(value);
-                    break;
-                case 'owner':
-                    this.updateOwner(value);
-                    break;
-                default:
-                    console.error(`Unhandled status key, value pair: {${key}: ${value}}`);
-                    break;
-            }
-        });
-    }
-    */
+	
     setNewRoomOwner(newOwnerName) {
         this.state.channel.send({'owner': newOwnerName});
     }
@@ -263,7 +206,7 @@ class Section extends Component {
     }
 
     handleMute() {
-        //need toggle button
+       
         if (this.player.isMuted()) {
             this.player.unMute()
         }

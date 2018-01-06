@@ -26,20 +26,11 @@ export default class UsersTable extends Component {
             users.delete(user);
         else {
             users.add(user);
-            /*
-                //send direcct video
-            console.log(this.state.channel);
-            var  vid = this.props.activeVideo;
-                console.log("DUPA DUPA " + user + vid);
-                ;*/
+          
         }
     }
 
     kickSelectedUsers() {
-        // TODO
-        // users available at this.selectedUsers
-        // use this.props.channel to send messages
-        console.log(this.selectedUsers);
 	
         for (var user of this.selectedUsers) {
             this.props.channel.channels[user].send({'kick': 'lecisz'})
@@ -84,10 +75,8 @@ export default class UsersTable extends Component {
 
             this.props.stopBeOwner(user);
             
-		//send message to user to become new owner
+	    //send message to user to become new owner
             this.props.channel.channels[user].send({"newOwner": true}) 
-            
-
 
             break;
 
