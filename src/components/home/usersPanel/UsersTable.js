@@ -40,9 +40,11 @@ export default class UsersTable extends Component {
         // users available at this.selectedUsers
         // use this.props.channel to send messages
         console.log(this.selectedUsers);
+	
         for (var user of this.selectedUsers) {
             this.props.channel.channels[user].send({'kick': 'lecisz'})
         }
+	this.selectedUsers.clear();
         console.log(this.selectedUsers)
 
     }
@@ -78,26 +80,14 @@ export default class UsersTable extends Component {
     transferOwner() {
 
         for (var user of this.selectedUsers) {
-            console.log(user);
-
+            // user = newOwner
 
             this.props.stopBeOwner(user);
-            // send new owner name
-            /*
-            const msg = {
-                            "changeOwner": true,
-                            "name": user
+            
+		//send message to user to become new owner
+            this.props.channel.channels[user].send({"newOwner": true}) 
+            
 
-                        };
-            this.props.channel.send(msg) //nowy message i obsługa
-            // send info to new owner
-            */
-
-            this.props.channel.channels[user].send({"newOwner": true}) //stan sie ownerem
-            //new owner send own video and start be owner
-
-
-            //this.props.channel.channels[user].send(msg)
 
             break;
 

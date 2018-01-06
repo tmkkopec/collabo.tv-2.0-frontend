@@ -17,7 +17,7 @@ export default class KurentoConfig {
         this.channel = new window.DataChannel();
         this.channel.userid = this.name;
 
-        //this.channel.autoCloseEntireSession = true;
+       
         let onMessageCallbacks = {};
         let socket = this.ws;
         let CurrentRoom = this.room;
@@ -37,7 +37,7 @@ export default class KurentoConfig {
                 channel: channel
             };
         };
-        //jakos trzeba zmienic bo nie dzialalo w tej funkcji
+       
 
         this.channel.onopen = () => {
             console.log("ONOPEN");
@@ -58,14 +58,14 @@ export default class KurentoConfig {
                     socket.emit('message', message);
 
                 }, 10);
-                //
+                
             }
         };
-        /*
-                this.channel.onleave = function (userid) {
-                console.log(userid +"   wyszedl");
-            };
-            */
+        
+       this.channel.onleave = function (userid) {
+                console.log(userid +"   left datachannel");
+        };
+           
         /*
 
         this.channel.onclose = () => {
@@ -81,14 +81,13 @@ export default class KurentoConfig {
         this.channel.onmessage = msg => {
 
             if (msg.time || msg.video) {
-                //console.log("ODEBRANO");
-                //console.log(msg);
+                
                 this._section.updateStatus(msg);
 
             }
             else if (msg.kick) {
                 console.log(msg.kick);
-                this.logout();
+                
                 this.onLogout();
             }
 
@@ -119,9 +118,7 @@ export default class KurentoConfig {
                 this._section.becomeNewOwner()
             }
 
-            else if (msg.creatorLeft) {
-                this._section.leaveDataChannel();
-            }
+            
 
             else if (msg.creatorLeft) {
                 this._section.leaveDataChannel();
@@ -148,7 +145,7 @@ export default class KurentoConfig {
             if (this.roomOwner) {
                 this.roomCreator = true;
                 this.ownerName = this.name;
-                // this.channel.userid = CurrentRoom;
+                
                 this.channel.open(CurrentRoom);
                 console.log(this.channel);
             }
@@ -171,7 +168,7 @@ export default class KurentoConfig {
 
 
         this.ws.on('messageDC', data => {
-            console.log('messageDC ' + data);
+            console.log(data);
             if (data.sender === this.channel.userid) return;
 
             if (onMessageCallbacks[data.channel]) {
@@ -185,9 +182,7 @@ export default class KurentoConfig {
 
             switch (parsedMessage.id) {
                 case 'owner':
-                    console.log("############################################################################");
-                    console.log(parsedMessage.owner);
-                    console.log(parsedMessage.todo);
+                    
                     if (parsedMessage.todo == 'askFilmUrlAndSetOwner') {
                         this.ownerName = parsedMessage.owner;
                         this._section.setOwnerName(parsedMessage.owner);
@@ -201,7 +196,7 @@ export default class KurentoConfig {
                     }
 
                     if (parsedMessage.todo == 'setOwners') {
-                        console.log("ZZZZZZZ" + parsedMessage.owner);
+                        
                         this.ownerName = parsedMessage.owner;
                         console.log(this.name + " " + parsedMessage.owner)
                         if (this.name == parsedMessage.owner) {
@@ -215,7 +210,7 @@ export default class KurentoConfig {
                     }
                     break;
 
-
+	/*
                 case 'connectToNewChannel':
                     console.log("HUHUHUHU");
 
@@ -224,7 +219,7 @@ export default class KurentoConfig {
                     console.log("CZY TERAZ JUZ DZIAŁA?");
 
 
-                    break;
+                    break;*/
                 case 'existingParticipants':
                     this.onExistingParticipants(parsedMessage);
                     break;
@@ -334,13 +329,23 @@ export default class KurentoConfig {
             id: 'leaveRoom'
         });
         if (this.roomOwner) {
-            //wyloguj wszystkich
+<<<<<<< HEAD
+          // this.props.channel.channels[user].send({'kick': 'true'})
+	for (let key in this.participants) {
+            
+		 this.channel.channels[this.participants[key]].send({'kick': 'true'});
+        }
+=======
+            for (let key in this.participants) {
+                this.channel.channels[key].send({'kick': 'lecisz'})
+            }
+>>>>>>> ab6d1df6c2dcb9d6e853e0b22902cb68d2187350
         }
         else if (this.roomCreator) {
-            //stowrz nowy kanal z ownera
-            //this.channel.send({creatorLeft : true}); //creatorLeft
+            //send mesege to owner to open chanel again
+           
             this.channel.channels[this.ownerName].send({createNewDatachannel: true});
-            //this.channel.autoCloseEntireSession = true;
+            
             this.channel.leave();
         }
         /*
@@ -356,7 +361,7 @@ export default class KurentoConfig {
         for (let key in this.participants) {
             this.participants[key].dispose();
         }
-
+	this.channel.leave();
         this.ws.close();
     }
 
